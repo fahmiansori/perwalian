@@ -6,15 +6,18 @@ class Jadwal_Perwalian extends CI_Controller
     public function __construct()
     {
         parent::__construct();
+        $this->load->model('user_model');
+        if($this->user_model->isNotLogin()) redirect(site_url('login'));
+        
         $this->load->model("jadwal_perwalian_model");
         $this->load->library('form_validation');
         $this->load->library('pagination');
     }
 
     function index(){
-        $config['base_url'] = site_url('jadwal_perwalian');
+        $config['base_url'] = site_url('jadwal_perwalian/index');
         $config['total_rows'] = $this->db->count_all('jadwal_perwalian');
-        $config['per_page'] = 4;
+        $config['per_page'] = 10;
         $config["uri_segment"] = 3;
         $choice = $config["total_rows"] / $config["per_page"];
         $config["num_links"] = floor($choice);
@@ -50,10 +53,10 @@ class Jadwal_Perwalian extends CI_Controller
         $this->load->view('app/jadwal_perwalian/list_page',$data);
     }
 
-    protected function indexcondition($cond){
-        $config['base_url'] = site_url('jadwal_perwalian');
-        $config['total_rows'] = $this->db->count_all('jadwal_perwalian');
-        $config['per_page'] = 4;
+    protected function indexcondition($cond,$page_active){
+        $config['base_url'] = site_url('jadwal_perwalian/'.$page_active);
+        $config['total_rows'] = $this->jadwal_perwalian_model->countDataCondition($cond);
+        $config['per_page'] = 10;
         $config["uri_segment"] = 3;
         $choice = $config["total_rows"] / $config["per_page"];
         $config["num_links"] = floor($choice);
@@ -91,23 +94,23 @@ class Jadwal_Perwalian extends CI_Controller
 
     public function menunggu()
     {
-        $this->indexcondition('waiting');
+        $this->indexcondition('waiting','menunggu');
     }
     public function dibatalkan()
     {
-        $this->indexcondition('canceled');
+        $this->indexcondition('canceled','dibatalkan');
     }
     public function telah_lewat()
     {
-        $this->indexcondition('expired');
+        $this->indexcondition('expired','telah_lewat');
     }
     public function berlangsung()
     {
-        $this->indexcondition('onprocess');
+        $this->indexcondition('onprocess','berlangsung');
     }
     public function selesai()
     {
-        $this->indexcondition('done');
+        $this->indexcondition('done','selesai');
     }
 
     protected function updatestatus($id, $url, $status)
@@ -218,5 +221,19 @@ class Jadwal_Perwalian extends CI_Controller
         }
 
         redirect(site_url('jadwal_perwalian'));
+    }
+
+    public function form_perwalian($id_perwalian = null)
+    {
+        $data = [];
+        $data['data_perwalian'] = null;
+        $data['id_perwalian'] = $id_perwalian;
+        $model = $this->jadwal_perwalian_model;
+
+        if ($id_perwalian) {
+            $data["data_perwalian"] = $model->getDataPerwalian($id_perwalian);
+        }
+
+        $this->load->view("app/jadwal_perwalian/form_perwalian", $data);
     }
 }

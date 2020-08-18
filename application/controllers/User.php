@@ -6,7 +6,8 @@ class User extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model("user_model");
+        $this->load->model('user_model');
+        if($this->user_model->isNotLogin()) redirect(site_url('login'));
         $this->load->library('form_validation');
         $this->load->library('pagination');
     }
@@ -21,7 +22,7 @@ class User extends CI_Controller
         //konfigurasi pagination
         $config['base_url'] = site_url('user/indexpage'); //site url
         $config['total_rows'] = $this->db->count_all('users'); //total row
-        $config['per_page'] = 4;  //show record per halaman
+        $config['per_page'] = 10;  //show record per halaman
         $config["uri_segment"] = 3;  // uri parameter
         $choice = $config["total_rows"] / $config["per_page"];
         $config["num_links"] = floor($choice);
@@ -70,6 +71,20 @@ class User extends CI_Controller
         }
 
         $this->load->view("app/user/new_form");
+    }
+
+    public function gantipassword()
+    {
+        $model = $this->user_model;
+        $validation = $this->form_validation;
+        $validation->set_rules($model->rulesgantipassword());
+
+        if ($validation->run()) {
+            $model->savepassword();
+            $this->session->set_flashdata('success', 'Berhasil disimpan');
+        }
+
+        $this->load->view("app/user/gantipassword");
     }
 
     public function edit($id = null)

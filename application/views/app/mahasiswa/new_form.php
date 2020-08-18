@@ -50,11 +50,22 @@
                         <label for="nim">NIM</label>
                         <div class="form-group">
                             <div class="form-line">
-                                <input type="text" id="nim" name="nim" class="form-control <?php echo form_error('nim') ? 'error':'' ?>" placeholder="Masukkan NIM">
+                                <input type="text" id="nim" name="nim" class="form-control <?php echo form_error('nim') ? 'error':'' ?>" placeholder="Masukkan NIM" required>
                             </div>
 
                             <?php if(form_error('nim')){ ?>
                                 <label id="nim-error" class="error" for="nim"><?php echo form_error('nim') ?></label>
+                            <?php } ?>
+                        </div>
+
+                        <label for="tahun_masuk">Tahun Masuk</label>
+                        <div class="form-group">
+                            <div class="form-line">
+                                <input type="number" id="tahun_masuk" name="tahun_masuk" class="form-control <?php echo form_error('tahun_masuk') ? 'error':'' ?>" placeholder="Masukkan tahun" required>
+                            </div>
+
+                            <?php if(form_error('tahun_masuk')){ ?>
+                                <label id="tahun_masuk-error" class="error" for="tahun_masuk"><?php echo form_error('tahun_masuk') ?></label>
                             <?php } ?>
                         </div>
 

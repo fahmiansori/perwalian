@@ -74,12 +74,12 @@
                             <?php } ?>
                         </div>
 
-                        <label for="role">Role</label>
-                        <div class="form-group">
+                        <label for="role" style="display:none;">Role</label>
+                        <div class="form-group" style="display:none;">
                             <div class="form-line">
                                 <select id="role" name="role" class="form-control show-tick <?php echo form_error('role') ? 'error':'' ?>" required>
                                     <option value="">-- Please select --</option>
-                                    <option value="1">Admin</option>
+                                    <option value="1" selected>Admin</option>
                                     <option value="2">Dosen</option>
                                     <option value="3">Mahasiswa</option>
                                 </select>

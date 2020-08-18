@@ -31,7 +31,7 @@
             <div class="card">
                 <div class="header">
                     <h2>
-                        EDIT <?= ucfirst($this->uri->segment(1)) ?>
+                        EDIT <?= ucwords(implode(' ',explode('_',$this->uri->segment(1)))) ?>
                     </h2>
                     <ul class="header-dropdown m-r--5">
                         <li class="dropdown">
@@ -89,6 +89,17 @@
 
                             <?php if(form_error('nim')){ ?>
                                 <label id="nim-error" class="error" for="nim"><?php echo form_error('nim') ?></label>
+                            <?php } ?>
+                        </div>
+
+                        <label for="semester">Semester Mahasiswa</label>
+                        <div class="form-group">
+                            <div class="form-line">
+                                <input value="<?php echo $data_detail->semester; ?>" type="number" id="semester" name="semester" class="form-control <?php echo form_error('semester') ? 'error':'' ?>" placeholder="Masukkan semester" required>
+                            </div>
+
+                            <?php if(form_error('semester')){ ?>
+                                <label id="semester-error" class="error" for="semester"><?php echo form_error('semester') ?></label>
                             <?php } ?>
                         </div>
 

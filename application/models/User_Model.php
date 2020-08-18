@@ -29,7 +29,7 @@ class User_Model extends CI_Model
             $isAdmin = $user->role == 1;
 
             // jika password benar dan dia admin
-            if($isPasswordTrue && $isAdmin){
+            if($isPasswordTrue){
                 // login sukses yay!
                 $this->session->set_userdata(['user_logged' => $user]);
                 $this->_updateLastLogin($user->id);
@@ -37,6 +37,7 @@ class User_Model extends CI_Model
             }
         }
 
+        $this->session->set_flashdata('failed', 'User tidak terdaftar atau password salah!');
         // login gagal
 		return false;
     }
@@ -84,6 +85,19 @@ class User_Model extends CI_Model
         ];
     }
 
+    public function rulesgantipassword()
+    {
+        return [
+            ['field' => 'password',
+            'label' => 'Password',
+            'rules' => 'required'],
+
+            ['field' => 'password_confirm',
+            'label' => 'Confirm Password',
+            'rules' => 'required|matches[password]'],
+        ];
+    }
+
     public function getAll()
     {
         return $this->db->get($this->_table)->result();
@@ -113,6 +127,17 @@ class User_Model extends CI_Model
         // $this->photo = $post["photo"];
         $this->is_active = 1;
         return $this->db->insert($this->_table, $this);
+    }
+
+    public function savepassword()
+    {
+        $post = $this->input->post();
+
+        $data_update = array(
+            'password' => password_hash($post["password"], PASSWORD_DEFAULT),
+        );
+
+        return $this->db->update($this->_table, $data_update, array('id' => $post['id']));
     }
 
     public function update()

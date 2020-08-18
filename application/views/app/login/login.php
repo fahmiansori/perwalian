@@ -34,7 +34,16 @@
         <div class="card">
             <div class="body">
                 <form id="sign_in" method="POST" action="">
-                    <div class="msg">Sign in to start your session</div>
+                    <div class="msg">
+                        Sign in to start your session
+                        <br>
+
+                        <?php if ($this->session->flashdata('failed')): ?>
+                            <div class="alert alert-danger" role="alert">
+                                <?php echo $this->session->flashdata('failed'); ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
                     <div class="input-group">
                         <span class="input-group-addon">
                             <i class="material-icons">person</i>

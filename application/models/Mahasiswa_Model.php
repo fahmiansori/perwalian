@@ -52,6 +52,11 @@ class Mahasiswa_Model extends CI_Model
         return $this->db->get_where($this->_table, ["id" => $id])->row();
     }
 
+    public function getByIdUser($user_id)
+    {
+        return $this->db->get_where($this->_table, ["user_id" => $user_id])->row();
+    }
+
     public function save()
     {
         $post = $this->input->post();
@@ -74,6 +79,7 @@ class Mahasiswa_Model extends CI_Model
             'dosen_id' => $post["dosen_id"],
             'program_studi_id' => $post["program_studi_id"],
             'user_id' => $last_user_id,
+            'tahun_masuk' => $post["tahun_masuk"],
         );
 
         return $this->db->insert($this->_table, $data_insert);
@@ -89,6 +95,7 @@ class Mahasiswa_Model extends CI_Model
             'alamat_mahasiswa' => $post["alamat_mahasiswa"],
             'dosen_id' => $post["dosen_id"],
             'program_studi_id' => $post["program_studi_id"],
+            'tahun_masuk' => $post["tahun_masuk"],
         );
 
         $mahasiswa = $this->db->get_where($this->_table, ["id" => $post['id']])->row();

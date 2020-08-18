@@ -12,7 +12,27 @@
             </div>
             <div class="info-container">
                 <div class="name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><?php echo $user->full_name; ?></div>
-                <div class="email"><?php echo $user->email; ?></div>
+                <div class="email">
+                    <?php
+                        echo $user->email;
+
+                        switch ($user->role) {
+                            case '1':
+                                echo "Administrator";
+                                break;
+                            case '2':
+                                echo "Dosen";
+                                break;
+                            case '3':
+                                echo "Mahasiswa";
+                                break;
+
+                            default:
+                                echo "-";
+                                break;
+                        }
+                    ?>
+                </div>
                 <div class="btn-group user-helper-dropdown">
                     <i class="material-icons" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">keyboard_arrow_down</i>
                     <ul class="dropdown-menu pull-right">
@@ -22,7 +42,7 @@
                             <li><a href="javascript:void(0);"><i class="material-icons">group</i>Followers</a></li>
                             <li><a href="javascript:void(0);"><i class="material-icons">shopping_cart</i>Sales</a></li>
                         -->
-                        <li><a href="javascript:void(0);"><i class="material-icons">favorite</i>Change Password</a></li>
+                        <li><a href="<?= site_url('user/gantipassword') ?>"><i class="material-icons">favorite</i>Change Password</a></li>
                         <li role="separator" class="divider"></li>
                         <li><a href="<?= site_url('login/logout') ?>"><i class="material-icons">input</i>Sign Out</a></li>
                     </ul>
@@ -45,11 +65,11 @@
                     <li class="<?php echo $this->uri->segment(1) == 'user'? 'active':'';?>">
                         <a href="<?= site_url('user') ?>">
                             <i class="material-icons">text_fields</i>
-                            <span>User</span>
+                            <span>User Admin</span>
                         </a>
                     </li>
 
-                    <li class="<?php echo $this->uri->segment(1) == 'dosen'? 'active':'';?>">
+                    <li class="<?php echo $this->uri->segment(1) == 'dosen' && $this->uri->segment(2) != 'mahasiswabimbingan'? 'active':'';?>">
                         <a href="<?= site_url('dosen') ?>">
                             <i class="material-icons">text_fields</i>
                             <span>Dosen</span>
@@ -63,6 +83,77 @@
                         </a>
                     </li>
 
+                    <li class="<?php echo $this->uri->segment(1) == 'jadwal_perwalian'? 'active':'';?>">
+                        <a href="javascript:void(0);" class="menu-toggle">
+                            <i class="material-icons">assignment</i>
+                            <span>Jadwal Perwalian</span>
+                        </a>
+
+                        <ul class="ml-menu">
+                            <li class="<?php echo $this->uri->segment(1) == 'jadwal_perwalian'&&empty($this->uri->segment(2))? 'active':'';?>">
+                                <a href="<?= site_url('jadwal_perwalian') ?>">Semua</a>
+                            </li>
+
+                            <li class="<?php echo $this->uri->segment(2) == 'menunggu'? 'active':'';?>">
+                                <a href="<?= site_url('jadwal_perwalian/menunggu') ?>">Menunggu</a>
+                            </li>
+                            <li class="<?php echo $this->uri->segment(2) == 'dibatalkan'? 'active':'';?>">
+                                <a href="<?= site_url('jadwal_perwalian/dibatalkan') ?>">Dibatalkan</a>
+                            </li>
+                            <li class="<?php echo $this->uri->segment(2) == 'telah_lewat'? 'active':'';?>">
+                                <a href="<?= site_url('jadwal_perwalian/telah_lewat') ?>">Telah lewat</a>
+                            </li>
+                            <li class="<?php echo $this->uri->segment(2) == 'berlangsung'? 'active':'';?>">
+                                <a href="<?= site_url('jadwal_perwalian/berlangsung') ?>">Sedang berlangsung</a>
+                            </li>
+                            <li class="<?php echo $this->uri->segment(2) == 'selesai'? 'active':'';?>">
+                                <a href="<?= site_url('jadwal_perwalian/selesai') ?>">Selesai</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="header"></li>
+                <?php endif;?>
+
+                <?php if($user->role==='2'):?>
+                    <li class="<?php echo $this->uri->segment(2) == 'mahasiswabimbingan' || $this->uri->segment(2) == 'mahasiswa_bimbingan_detail'? 'active':'';?>">
+                        <a href="<?= site_url('dosen/mahasiswabimbingan') ?>">
+                            <i class="material-icons">text_fields</i>
+                            <span>Mahasiswa Bimbingan</span>
+                        </a>
+                    </li>
+
+                    <li class="<?php echo $this->uri->segment(1) == 'jadwal_perwalian'? 'active':'';?>">
+                        <a href="javascript:void(0);" class="menu-toggle">
+                            <i class="material-icons">assignment</i>
+                            <span>Jadwal Perwalian</span>
+                        </a>
+
+                        <ul class="ml-menu">
+                            <li class="<?php echo $this->uri->segment(1) == 'jadwal_perwalian'&&empty($this->uri->segment(2))? 'active':'';?>">
+                                <a href="<?= site_url('jadwal_perwalian') ?>">Semua</a>
+                            </li>
+
+                            <li class="<?php echo $this->uri->segment(2) == 'menunggu'? 'active':'';?>">
+                                <a href="<?= site_url('jadwal_perwalian/menunggu') ?>">Menunggu</a>
+                            </li>
+                            <li class="<?php echo $this->uri->segment(2) == 'dibatalkan'? 'active':'';?>">
+                                <a href="<?= site_url('jadwal_perwalian/dibatalkan') ?>">Dibatalkan</a>
+                            </li>
+                            <li class="<?php echo $this->uri->segment(2) == 'telah_lewat'? 'active':'';?>">
+                                <a href="<?= site_url('jadwal_perwalian/telah_lewat') ?>">Telah lewat</a>
+                            </li>
+                            <li class="<?php echo $this->uri->segment(2) == 'berlangsung'? 'active':'';?>">
+                                <a href="<?= site_url('jadwal_perwalian/berlangsung') ?>">Sedang berlangsung</a>
+                            </li>
+                            <li class="<?php echo $this->uri->segment(2) == 'selesai'? 'active':'';?>">
+                                <a href="<?= site_url('jadwal_perwalian/selesai') ?>">Selesai</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="header"></li>
+                <?php endif;?>
+
+                <?php if($user->role==='3'):?>
                     <li class="<?php echo $this->uri->segment(1) == 'jadwal_perwalian'? 'active':'';?>">
                         <a href="javascript:void(0);" class="menu-toggle">
                             <i class="material-icons">assignment</i>

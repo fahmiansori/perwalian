@@ -11,6 +11,10 @@
 
 <?php $this->load->view('app/_template/4content.php'); ?>
 <!-- CONTENT HERE -->
+<?php
+    $user = $this->session->userdata("user_logged");
+?>
+
 <div class="">
     <?php if ($this->session->flashdata('success')): ?>
         <div class="alert alert-success" role="alert">
@@ -30,6 +34,40 @@
           <div class="card">
               <div class="header">
                   <h2>
+                      <?php
+                          function tanggal_indo($tanggal)
+                          {
+                              $hari = array ( 1 =>    'Senin',
+                                  'Selasa',
+                                  'Rabu',
+                                  'Kamis',
+                                  'Jumat',
+                                  'Sabtu',
+                                  'Minggu'
+                              );
+
+                              $bulan = array (1 =>   'Januari',
+                                  'Februari',
+                                  'Maret',
+                                  'April',
+                                  'Mei',
+                                  'Juni',
+                                  'Juli',
+                                  'Agustus',
+                                  'September',
+                                  'Oktober',
+                                  'November',
+                                  'Desember'
+                              );
+                              $tanggal_ = date('Y-m-d', strtotime($tanggal));
+                              $split 	  = explode('-', $tanggal_);
+                              $tgl_indo = $split[2] . ' ' . $bulan[ (int)$split[1] ] . ' ' . $split[0];
+
+                              $num = date('N', strtotime($tanggal));
+                              $jam = date('H:i', strtotime($tanggal));
+                              return $jam.', '. $hari[$num] . ' ' . $tgl_indo;
+                          }
+                      ?>
                       <?= ucwords(implode(' ',explode('_',$this->uri->segment(1)))) ?> - <?= ucwords(implode(' ',explode('_',$this->uri->segment(2)))) ?>
                       <!-- <small>Use <code>.table-striped</code> to add zebra-striping to any table row within the <code>&lt;tbody&gt;</code></small> -->
                   </h2>
@@ -39,7 +77,9 @@
                               <i class="material-icons">more_vert</i>
                           </a>
                           <ul class="dropdown-menu pull-right">
-                              <li><a href="<?php echo site_url('jadwal_perwalian/add') ?>">Add</a></li>
+                              <?php if (isset($user) && $user && $user->role === '1'): ?>
+                                  <li><a href="<?php echo site_url('jadwal_perwalian/add') ?>">Add</a></li>
+                              <?php endif; ?>
                           </ul>
                       </li>
                   </ul>
@@ -52,6 +92,7 @@
                               <th>#</th>
                               <th>Jadwal</th>
                               <th>Nama Mahasiswa</th>
+                              <th>Semester</th>
                               <th>Nama Dosen</th>
                               <th>Status</th>
                               <th>Isi Perwalian</th>
@@ -69,10 +110,14 @@
                                   <tr>
                                       <th scope="row"><?php echo ++$no; ?></th>
                                       <td>
-                                          <?php echo date('H:i, l d F Y',strtotime($row->waktu)) ?>
+                                          <!-- < ?php echo date('H:i, l d F Y',strtotime($row->waktu)) ?> -->
+                                          <?php echo tanggal_indo($row->waktu) ?>
                                       </td>
                                       <td>
                                           <?php echo $row->nama_mahasiswa ?>
+                                      </td>
+                                      <td>
+                                          <?php echo $row->semester ?>
                                       </td>
                                       <td>
                                           <?php echo $row->nama_dosen ?>
@@ -115,37 +160,44 @@
                                           <?php echo $row->isi_perwalian ?>
                                       </td>
                                       <td>
-                                          <?php if(date('Y-m-d', strtotime($today)) <= date('Y-m-d',strtotime($row->waktu)) && $row->status == 'waiting'):?>
-                                              <a href="<?php echo site_url('jadwal_perwalian/batalkan/'.$row->id.'/'.$this->uri->segment(2)) ?>"
-                                                  class="btn btn-small text-warning"><i class="material-icons">stop</i> Batalkan
-                                              </a>
+                                          <?php if (isset($user) && $user && $user->role === '1' || isset($user) && $user && $user->role === '2'): ?>
+                                              <?php if(date('Y-m-d', strtotime($today)) <= date('Y-m-d',strtotime($row->waktu)) && $row->status == 'waiting'):?>
+                                                  <a href="<?php echo site_url('jadwal_perwalian/batalkan/'.$row->id.'/'.$this->uri->segment(2)) ?>"
+                                                      class="btn btn-small text-warning"><i class="material-icons">stop</i> Batalkan
+                                                  </a>
 
-                                              <?php if(date('Y-m-d', strtotime($today)) == date('Y-m-d',strtotime($row->waktu)) && $row->status == 'waiting'):?>
-                                                  <a href="<?php echo site_url('jadwal_perwalian/bimbingan/'.$row->id) ?>"
-                                                      class="btn btn-small text-info"><i class="material-icons">skip_next</i> Sedang bimbingan
+                                                  <?php if(date('Y-m-d', strtotime($today)) == date('Y-m-d',strtotime($row->waktu)) && $row->status == 'waiting'):?>
+                                                      <a href="<?php echo site_url('jadwal_perwalian/bimbingan/'.$row->id) ?>"
+                                                          class="btn btn-small text-info"><i class="material-icons">skip_next</i> Sedang bimbingan
+                                                      </a>
+                                                  <?php endif;?>
+
+                                                  <a href="<?php echo site_url('jadwal_perwalian/edit/'.$row->id) ?>"
+                                                      class="btn btn-small"><i class="material-icons">gesture</i> Edit
+                                                  </a>
+
+                                                  <?php if (isset($user) && $user && $user->role === '1'): ?>
+                                                      <a onclick="deleteConfirm('<?php echo site_url('jadwal_perwalian/delete/'.$row->id) ?>')"
+                                                          href="#!" class="btn btn-small text-danger"><i class="material-icons">delete_forever</i> Hapus
+                                                      </a>
+                                                  <?php endif; ?>
+                                              <?php endif;?>
+
+                                              <?php if($row->status == 'onprocess'):?>
+                                                  <a href="<?php echo site_url('jadwal_perwalian/selesaikan/'.$row->id) ?>"
+                                                      class="btn btn-small text-success"><i class="material-icons">check</i> Selesai
                                                   </a>
                                               <?php endif;?>
 
-                                              <a href="<?php echo site_url('jadwal_perwalian/edit/'.$row->id) ?>"
-                                                  class="btn btn-small"><i class="material-icons">gesture</i> Edit
-                                              </a>
+                                              <?php if($row->status == 'done'):?>
+                                                  <a href="<?php echo site_url('jadwal_perwalian/editisi/'.$row->id) ?>"
+                                                      class="btn btn-small text-success"><i class="material-icons">gesture</i> Edit Isi
+                                                  </a>
+                                              <?php endif;?>
+                                          <?php endif; ?>
 
-                                              <a onclick="deleteConfirm('<?php echo site_url('jadwal_perwalian/delete/'.$row->id) ?>')"
-                                                  href="#!" class="btn btn-small text-danger"><i class="material-icons">delete_forever</i> Hapus
-                                              </a>
-                                          <?php endif;?>
-
-                                          <?php if($row->status == 'onprocess'):?>
-                                              <a href="<?php echo site_url('jadwal_perwalian/selesaikan/'.$row->id) ?>"
-                                                  class="btn btn-small text-success"><i class="material-icons">check</i> Selesai
-                                              </a>
-                                          <?php endif;?>
-
-                                          <?php if($row->status == 'done'):?>
-                                              <a href="<?php echo site_url('jadwal_perwalian/editisi/'.$row->id) ?>"
-                                                  class="btn btn-small text-success"><i class="material-icons">gesture</i> Edit Isi
-                                              </a>
-                                          <?php endif;?>
+                                          <a href="<?php echo site_url('jadwal_perwalian/form_perwalian/'.$row->id) ?>" class="btn btn-small text-success"><i class="material-icons">print</i> Print
+                                          </a>
                                       </td>
                                   </tr>
                               <?php endforeach; ?>

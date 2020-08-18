@@ -6,6 +6,9 @@ class Mahasiswa extends CI_Controller
     public function __construct()
     {
         parent::__construct();
+        $this->load->model('user_model');
+        if($this->user_model->isNotLogin()) redirect(site_url('login'));
+        
         $this->load->model("mahasiswa_model");
         $this->load->library('form_validation');
         $this->load->library('pagination');
@@ -15,7 +18,7 @@ class Mahasiswa extends CI_Controller
         //konfigurasi pagination
         $config['base_url'] = site_url('mahasiswa'); //site url
         $config['total_rows'] = $this->db->count_all('mahasiswa'); //total row
-        $config['per_page'] = 4;  //show record per halaman
+        $config['per_page'] = 10;  //show record per halaman
         $config["uri_segment"] = 3;  // uri parameter
         $choice = $config["total_rows"] / $config["per_page"];
         $config["num_links"] = floor($choice);

@@ -11,6 +11,12 @@ class Jadwal_Perwalian_Model extends CI_Model
     public $waktu;
     public $status;
 
+    public function __construct()
+    {
+        $this->load->model("dosen_model");
+        $this->load->model("mahasiswa_model");
+    }
+
     public function rules()
     {
         return [
@@ -57,14 +63,26 @@ class Jadwal_Perwalian_Model extends CI_Model
 
     public function getWithPagination($limit, $start)
     {
-        $query = $this->db->select($this->_table.'.*, dosen.nama_dosen, mahasiswa.nama_mahasiswa, users.full_name, perwalian.isi_perwalian')
-         ->from($this->_table)
-         ->join('dosen', 'dosen.id = '.$this->_table.'.dosen_id')
-         ->join('mahasiswa', 'mahasiswa.nim = '.$this->_table.'.nim')
-         ->join('users', 'users.id = '.$this->_table.'.user_id')
-         ->join('perwalian', 'perwalian.jadwal_perwalian_id = '.$this->_table.'.id','left')
-         ->limit($limit, $start)
-         ->get();
+        $user = $this->session->userdata("user_logged");
+
+         if ($user && $user->role === '2') {
+             $dosen = $this->dosen_model->getByIdUser($user->id);
+             $this->db->where($this->_table.'.dosen_id', $dosen->id);
+         }else if ($user && $user->role === '3') {
+             $mahasiswa = $this->mahasiswa_model->getByIdUser($user->id);
+             $this->db->where($this->_table.'.nim', $mahasiswa->nim);
+         }
+
+        $this->db->select($this->_table.'.*, dosen.nama_dosen, mahasiswa.nama_mahasiswa, users.full_name, perwalian.isi_perwalian')
+          ->from($this->_table)
+          ->join('dosen', 'dosen.id = '.$this->_table.'.dosen_id')
+          ->join('mahasiswa', 'mahasiswa.nim = '.$this->_table.'.nim')
+          ->join('users', 'users.id = '.$this->_table.'.user_id')
+          ->join('perwalian', 'perwalian.jadwal_perwalian_id = '.$this->_table.'.id','left')
+          ->order_by($this->_table.'.waktu', 'desc')
+          ->limit($limit, $start);
+
+        $query = $this->db->get();
         return $query;
     }
 
@@ -73,22 +91,59 @@ class Jadwal_Perwalian_Model extends CI_Model
         if (empty($cond)) {
             return $this->getWithPagination($limit, $start);
         }
+        $user = $this->session->userdata("user_logged");
 
-        $query = $this->db->select($this->_table.'.*, dosen.nama_dosen, mahasiswa.nama_mahasiswa, users.full_name, perwalian.isi_perwalian')
+        if ($user && $user->role === '2') {
+            $dosen = $this->dosen_model->getByIdUser($user->id);
+            $this->db->where($this->_table.'.dosen_id', $dosen->id);
+        }else if ($user && $user->role === '3') {
+            $mahasiswa = $this->mahasiswa_model->getByIdUser($user->id);
+            $this->db->where($this->_table.'.nim', $mahasiswa->nim);
+        }
+
+        $this->db->select($this->_table.'.*, dosen.nama_dosen, mahasiswa.nama_mahasiswa, users.full_name, perwalian.isi_perwalian')
          ->from($this->_table)
          ->join('dosen', 'dosen.id = '.$this->_table.'.dosen_id')
          ->join('mahasiswa', 'mahasiswa.nim = '.$this->_table.'.nim')
          ->join('users', 'users.id = '.$this->_table.'.user_id')
-         ->join('perwalian', 'perwalian.jadwal_perwalian_id = '.$this->_table.'.id','left')
-         ->limit($limit, $start)
+         ->join('perwalian', 'perwalian.jadwal_perwalian_id = '.$this->_table.'.id', 'left')
          ->where($this->_table.'.status', $cond)
-         ->get();
+         ->order_by($this->_table.'.waktu', 'desc')
+         ->limit($limit, $start);
+
+         $query = $this->db->get();
         return $query;
+    }
+
+    public function countDataCondition($cond='')
+    {
+        if (empty($cond)) {
+            return 0;
+        }
+
+        $this->db->where($this->_table.'.status', $cond);
+        $this->db->from($this->_table);
+
+        return $this->db->count_all_results();
     }
 
     public function getById($id)
     {
         return $this->db->get_where($this->_table, ["id" => $id])->row();
+    }
+
+    public function getDataPerwalian($id)
+    {
+        // return $this->db->select($this->_table.'.*, dosen.nama_dosen, mahasiswa.nama_mahasiswa, users.full_name, perwalian.isi_perwalian')
+        //  ->from($this->_table)
+        //  ->join('dosen', 'dosen.id = '.$this->_table.'.dosen_id')
+        //  ->join('mahasiswa', 'mahasiswa.nim = '.$this->_table.'.nim')
+        //  ->join('users', 'users.id = '.$this->_table.'.user_id')
+        // ->join('perwalian', 'perwalian.jadwal_perwalian_id = '.$this->_table.'.id', 'left')
+        // ->where($this->_table.'.id', $id)
+        // ->row();
+
+        return $this->db->query('SELECT '.$this->_table.'.*, dosen.nama_dosen, mahasiswa.nama_mahasiswa, users.full_name, perwalian.isi_perwalian from '.$this->_table.' inner join dosen on dosen.id = '.$this->_table.'.dosen_id inner join mahasiswa on mahasiswa.nim = '.$this->_table.'.nim inner join users on users.id = '.$this->_table.'.user_id left join perwalian on perwalian.jadwal_perwalian_id = '.$this->_table.'.id where '.$this->_table.'.id = '. $id)->row();
     }
 
     public function save()
@@ -107,6 +162,7 @@ class Jadwal_Perwalian_Model extends CI_Model
             'user_id' => $admin_id,
             'waktu' => $waktu,
             'status' => 'waiting',
+            'semester' => $post["semester"],
         );
         /**
          * Status
@@ -131,6 +187,7 @@ class Jadwal_Perwalian_Model extends CI_Model
             'nim' => $post["nim"],
             'dosen_id' => $post["dosen_id"],
             'waktu' => $waktu,
+            'semester' => $post["semester"],
         );
 
         return $this->db->update($this->_table, $data_update, array('id' => $post['id']));

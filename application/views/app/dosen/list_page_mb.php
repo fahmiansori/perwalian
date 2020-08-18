@@ -30,7 +30,7 @@
           <div class="card">
               <div class="header">
                   <h2>
-                      <?= ucfirst($this->uri->segment(1)) ?>
+                      <?= "List Mahasiswa Bimbingan" ?>
                       <!-- <small>Use <code>.table-striped</code> to add zebra-striping to any table row within the <code>&lt;tbody&gt;</code></small> -->
                   </h2>
                   <ul class="header-dropdown m-r--5">
@@ -39,7 +39,6 @@
                               <i class="material-icons">more_vert</i>
                           </a>
                           <ul class="dropdown-menu pull-right">
-                              <li><a href="<?php echo site_url('mahasiswa/add') ?>">Add</a></li>
                           </ul>
                       </li>
                   </ul>
@@ -50,12 +49,10 @@
                       <thead>
                           <tr>
                               <th>#</th>
-                              <th>NIM</th>
                               <th>Nama</th>
-                              <th>Alamat</th>
-                              <th>Dosen</th>
-                              <th>Prodi</th>
                               <th>Tahun Masuk</th>
+                              <th>Semester Sekarang (by <?= date('Y') ?>)</th>
+                              <th>Jumlah bimbingan</th>
                               <th>Aksi</th>
                           </tr>
                       </thead>
@@ -68,29 +65,32 @@
                           <tr>
                             <th scope="row"><?php echo ++$no; ?></th>
                             <td>
-                              <?php echo $row->nim ?>
-                            </td>
-                            <td>
                               <?php echo $row->nama_mahasiswa ?>
-                            </td>
-                            <td>
-                              <?php echo $row->alamat_mahasiswa ?>
-                            </td>
-                            <td>
-                              <?php echo $row->nama_dosen ?>
-                            </td>
-                            <td>
-                              <?php echo $row->nama_prodi ?>
                             </td>
                             <td>
                               <?php echo $row->tahun_masuk ?>
                             </td>
                             <td>
-                              <a href="<?php echo site_url('mahasiswa/edit/'.$row->id) ?>"
-                                class="btn btn-small"><i class="material-icons">gesture</i> Edit
-                              </a>
-                              <a onclick="deleteConfirm('<?php echo site_url('mahasiswa/delete/'.$row->id) ?>')"
-                                href="#!" class="btn btn-small text-danger"><i class="material-icons">delete_forever</i> Hapus
+                              <?php
+                                $semester_sekarang = '';
+                                if (!empty($row->tahun_masuk)) {
+                                    $tahun_sekarang = date('Y');
+                                    $bulan_sekarang = date('m');
+                                    $semester_sekarang = ((int) $tahun_sekarang - (int) $row->tahun_masuk) * 2;
+
+                                    if ($bulan_sekarang >= 9) {
+                                        $semester_sekarang += 1;
+                                    }
+                                }
+                                echo $semester_sekarang;
+                              ?>
+                            </td>
+                            <td>
+                              <?php echo $row->jumlah_perwalian ?>
+                            </td>
+                            <td>
+                              <a href="<?php echo site_url('dosen/mahasiswa_bimbingan_detail/'.$row->nim) ?>"
+                                class="btn btn-small"><i class="material-icons">visibility</i> Detail
                               </a>
                             </td>
                           </tr>

@@ -39,9 +39,56 @@ class Dosen_Model extends CI_Model
         return $query;
     }
 
+    public function getWithPaginationMB($limit, $start, $dosen_id)
+    {
+        // Mahassiwa bimbingan
+        $query = $this->db->select('mahasiswa.*, (select count(*) from jadwal_perwalian jp where jp.nim=jadwal_perwalian.nim) as jumlah_perwalian')
+         ->from('jadwal_perwalian')
+         ->join('dosen', 'dosen.id = jadwal_perwalian.dosen_id')
+         ->join('mahasiswa', 'mahasiswa.nim = jadwal_perwalian.nim')
+         ->join('users', 'users.id = jadwal_perwalian.user_id')
+         ->join('perwalian', 'perwalian.jadwal_perwalian_id = jadwal_perwalian.id','left')
+         ->where('jadwal_perwalian.dosen_id', $dosen_id)
+         ->limit($limit, $start)
+         ->group_by('mahasiswa.nim')
+         ->get();
+        return $query;
+    }
+
+    public function getJadwalWithPaginationCondition($limit, $start, $nim, $cond='')
+    {
+        $user_logged = $this->session->userdata("user_logged");
+        $dosen = $this->db->get_where('dosen', ["user_id" => $user_logged->id])->row();
+        $dosen_id = $dosen->id;
+
+        $this->db->where('jadwal_perwalian.dosen_id', $dosen_id);
+        $this->db->where('jadwal_perwalian.nim', $nim);
+
+        if (!empty($cond)) {
+            $this->db->where('jadwal_perwalian.status', $cond);
+        }
+
+        $this->db->select('jadwal_perwalian.*, dosen.nama_dosen, mahasiswa.nama_mahasiswa, users.full_name, perwalian.isi_perwalian')
+         ->from('jadwal_perwalian')
+         ->join('dosen', 'dosen.id = '.'jadwal_perwalian.dosen_id')
+         ->join('mahasiswa', 'mahasiswa.nim = '.'jadwal_perwalian.nim')
+         ->join('users', 'users.id = '.'jadwal_perwalian.user_id')
+         ->join('perwalian', 'perwalian.jadwal_perwalian_id = '.'jadwal_perwalian.id', 'left')
+         ->order_by('jadwal_perwalian.waktu', 'desc')
+         ->limit($limit, $start);
+
+         $query = $this->db->get();
+        return $query;
+    }
+
     public function getById($id)
     {
         return $this->db->get_where($this->_table, ["id" => $id])->row();
+    }
+
+    public function getByIdUser($user_id)
+    {
+        return $this->db->get_where($this->_table, ["user_id" => $user_id])->row();
     }
 
     public function save()
@@ -125,5 +172,42 @@ class Dosen_Model extends CI_Model
         }
 
         return $data;
+    }
+
+    public function countMahasiswaBimbingan($dosen_id)
+    {
+        return $this->db->select('mahasiswa.*, (select count(*) from jadwal_perwalian jp where jp.nim=jadwal_perwalian.nim) as jumlah_perwalian')
+         ->from('jadwal_perwalian')
+         ->join('dosen', 'dosen.id = jadwal_perwalian.dosen_id')
+         ->join('mahasiswa', 'mahasiswa.nim = jadwal_perwalian.nim')
+         ->join('users', 'users.id = jadwal_perwalian.user_id')
+         ->join('perwalian', 'perwalian.jadwal_perwalian_id = jadwal_perwalian.id','left')
+         ->where('jadwal_perwalian.dosen_id', $dosen_id)
+         ->group_by('mahasiswa.nim')
+         ->count_all_results();
+    }
+
+    public function countMahasiswaBimbinganDetail($nim, $cond='')
+    {
+        $user_logged = $this->session->userdata("user_logged");
+        $dosen = $this->db->get_where('dosen', ["user_id" => $user_logged->id])->row();
+        $dosen_id = $dosen->id;
+
+        $this->db->where('jadwal_perwalian.dosen_id', $dosen_id);
+        $this->db->where('jadwal_perwalian.nim', $nim);
+
+        if (!empty($cond)) {
+            $this->db->where('jadwal_perwalian.status', $cond);
+        }
+
+        $this->db->select('jadwal_perwalian.*, dosen.nama_dosen, mahasiswa.nama_mahasiswa, users.full_name, perwalian.isi_perwalian')
+         ->from('jadwal_perwalian')
+         ->join('dosen', 'dosen.id = '.'jadwal_perwalian.dosen_id')
+         ->join('mahasiswa', 'mahasiswa.nim = '.'jadwal_perwalian.nim')
+         ->join('users', 'users.id = '.'jadwal_perwalian.user_id')
+         ->join('perwalian', 'perwalian.jadwal_perwalian_id = '.'jadwal_perwalian.id', 'left')
+         ->order_by('jadwal_perwalian.waktu', 'desc');
+
+        return $this->db->count_all_results();
     }
 }
