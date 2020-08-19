@@ -13,6 +13,14 @@
 
 <?php $this->load->view('app/_template/4content.php'); ?>
 <!-- CONTENT HERE -->
+<?php
+    $user_logged = $this->session->userdata("user_logged");
+    $dosen_id = '';
+    if ($user_logged->role === '2') {
+        $dosen_ = $this->db->get_where('dosen', ["user_id" => $user_logged->id])->row();
+        $dosen_id = $dosen_->id;
+    }
+?>
 <div class="">
     <?php if ($this->session->flashdata('success')): ?>
         <div class="alert alert-success" role="alert">
@@ -65,7 +73,11 @@
                                 <select id="dosen_id" name="dosen_id" class="form-control show-tick <?php echo form_error('dosen_id') ? 'error':'' ?>" required>
                                     <option value="">-- Please select --</option>
                                     <?php foreach ($dosen as $row): ?>
-                                        <option value="<?php echo $row->id; ?>"><?php echo $row->nama_dosen; ?></option>
+                                        <?php if ($user_logged->role === '2' && $dosen_id==$row->id): ?>
+                                            <option value="<?php echo $row->id; ?>" <?php echo ($dosen_id==$row->id)? 'selected':''; ?>><?php echo $row->nama_dosen; ?></option>
+                                        <?php else: ?>
+                                            <option value="<?php echo $row->id; ?>"><?php echo $row->nama_dosen; ?></option>
+                                        <?php endif; ?>
                                     <?php endforeach; ?>
                                 </select>
                             </div>

@@ -91,6 +91,25 @@ class Dosen_Model extends CI_Model
         return $this->db->get_where($this->_table, ["user_id" => $user_id])->row();
     }
 
+    private function _uploadImage($file_name)
+    {
+        $config['upload_path']          = './assets/images/tanda_tangan';
+        $config['allowed_types']        = 'gif|jpg|png';
+        $config['file_name']            = $file_name;
+        $config['overwrite']			= true;
+        $config['max_size']             = 10240; // 1MB
+        // $config['max_width']            = 1024;
+        // $config['max_height']           = 768;
+
+        $this->load->library('upload', $config);
+
+        if ($this->upload->do_upload('tanda_tangan')) {
+            return $this->upload->data("file_name");
+        }
+
+        return "default.jpg";
+    }
+
     public function save()
     {
         $post = $this->input->post();
@@ -113,17 +132,37 @@ class Dosen_Model extends CI_Model
             'user_id' => $last_user_id,
         );
 
-        return $this->db->insert($this->_table, $data_insert);
+        $insert = $this->db->insert($this->_table, $data_insert);
+        $last_dosen_id = $this->db->insert_id();
+
+        if (!empty($_FILES["tanda_tangan"]["name"])) {
+            $tanda_tangan_ = $this->_uploadImage($last_dosen_id);
+            $data_update = array(
+                'tanda_tangan' => $tanda_tangan_,
+            );
+            $this->db->update($this->_table, $data_update, array('id' => $last_dosen_id));
+        } else {
+            $tanda_tangan_ = '';
+        }
+
+        return $insert;
     }
 
     public function update()
     {
         $post = $this->input->post();
 
+        if (!empty($_FILES["tanda_tangan"]["name"])) {
+            $tanda_tangan_ = $this->_uploadImage($post['id']);
+        } else {
+            $tanda_tangan_ = $post["old_tanda_tangan"];
+        }
+
         $data_update = array(
             'nip' => $post["nip"],
             'nama_dosen' => $post["nama_dosen"],
             'alamat_dosen' => $post["alamat_dosen"],
+            'tanda_tangan' => $tanda_tangan_,
         );
 
         $dosen = $this->db->get_where($this->_table, ["id" => $post['id']])->row();
@@ -169,10 +208,20 @@ class Dosen_Model extends CI_Model
 
         if ($dosen) {
             $this->db->delete('users', array("id" => $dosen->user_id));
+            $this->_deleteImage($dosen);
         }
 
         return $data;
     }
+
+    private function _deleteImage($dosen)
+    {
+        if ($dosen->tanda_tangan != "default.jpg") {
+            $filename = explode(".", $dosen->tanda_tangan)[0];
+            return array_map('unlink', glob(FCPATH."assets/images/tanda_tangan/$filename.*"));
+        }
+    }
+
 
     public function countMahasiswaBimbingan($dosen_id)
     {

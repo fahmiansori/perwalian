@@ -77,7 +77,7 @@
                               <i class="material-icons">more_vert</i>
                           </a>
                           <ul class="dropdown-menu pull-right">
-                              <?php if (isset($user) && $user && $user->role === '1'): ?>
+                              <?php if (isset($user) && $user && $user->role === '1' || isset($user) && $user && $user->role === '2'): ?>
                                   <li><a href="<?php echo site_url('jadwal_perwalian/add') ?>">Add</a></li>
                               <?php endif; ?>
                           </ul>
@@ -194,6 +194,14 @@
                                                       class="btn btn-small text-success"><i class="material-icons">gesture</i> Edit Isi
                                                   </a>
                                               <?php endif;?>
+                                          <?php endif; ?>
+
+                                          <?php if (date('Y-m-d', strtotime($today)) <= date('Y-m-d',strtotime($row->waktu)) && isset($user) && $user && $user->role === '3'): ?>
+                                              <?php if ($row->status == 'waiting'): ?>
+                                                  <a href="<?php echo site_url('jadwal_perwalian/form_uraian/'.$row->id) ?>" class="btn btn-small text-success">
+                                                      <i class="material-icons">print</i> Isi uraian
+                                                  </a>
+                                              <?php endif; ?>
                                           <?php endif; ?>
 
                                           <a href="<?php echo site_url('jadwal_perwalian/form_perwalian/'.$row->id) ?>" class="btn btn-small text-success"><i class="material-icons">print</i> Print

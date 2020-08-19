@@ -1,9 +1,13 @@
 <?php
 	$nama_dosen = '';
 	$nama_mahasiswa = '';
+	$tanda_tangan = '';
+	$status = '';
 	if (isset($data_perwalian) && $data_perwalian) {
 		$nama_dosen = $data_perwalian->nama_dosen;
 		$nama_mahasiswa = $data_perwalian->nama_mahasiswa;
+		$tanda_tangan = $data_perwalian->tanda_tangan;
+		$status = $data_perwalian->status;
 	}
 ?>
 
@@ -60,51 +64,119 @@
 			<p style="font-size: 12pt; text-align: justify;"> Dosen Wali :<b> <?php echo $nama_dosen; ?> </b></p>
 		</center>
 
-		<center>		
+		<center>
 			<table border="1" cellpadding="50">
-			<tr>
-				<th scope="col">NO</th>
-				<th scope="col">Tanggal</th>
-				<th scope="col">Jenis Bimbingan</th>
-				<th scope="col">Uraian Konsultasi</th>
-				<th scope="col">Tanda Tangan Dosen</th>
-			</tr>
-			<tr>
-				<th scope="col"></th>
-				<th scope="col"></th>
-				<th scope="col"></th>
-				<th scope="col"></th>
-				<th scope="col"></th>
-			</tr>
-			<tr>
-				<th scope="col"></th>
-				<th scope="col"></th>
-				<th scope="col"></th>
-				<th scope="col"></th>
-				<th scope="col"></th>
-			</tr>
-			<tr>
-				<th scope="col"></th>
-				<th scope="col"></th>
-				<th scope="col"></th>
-				<th scope="col"></th>
-				<th scope="col"></th>
-			</tr>
-			<tr>
-				<th scope="col"></th>
-				<th scope="col"></th>
-				<th scope="col"></th>
-				<th scope="col"></th>
-				<th scope="col"></th>
-			</tr>
-			<tr>
-				<th scope="col"></th>
-				<th scope="col"></th>
-				<th scope="col"></th>
-				<th scope="col"></th>
-				<th scope="col"></th>
-			</tr>
-		</table>
-	</center>
+				<tr>
+					<th scope="col">NO</th>
+					<th scope="col">Tanggal</th>
+					<th scope="col">Jenis Bimbingan</th>
+					<th scope="col">Uraian Konsultasi</th>
+					<th scope="col">Tanda Tangan Dosen</th>
+				</tr>
+				<?php if ($data_perwalian_mahasiswa && $data_perwalian_mahasiswa->num_rows() > 0): ?>
+					<?php
+						function tanggal_indo($tanggal)
+						{
+							$hari = array ( 1 =>    'Senin',
+								'Selasa',
+								'Rabu',
+								'Kamis',
+								'Jumat',
+								'Sabtu',
+								'Minggu'
+							);
+
+							$bulan = array (1 =>   'Januari',
+								'Februari',
+								'Maret',
+								'April',
+								'Mei',
+								'Juni',
+								'Juli',
+								'Agustus',
+								'September',
+								'Oktober',
+								'November',
+								'Desember'
+							);
+							$tanggal_ = date('Y-m-d', strtotime($tanggal));
+							$split 	  = explode('-', $tanggal_);
+							$tgl_indo = $split[2] . ' ' . $bulan[ (int)$split[1] ] . ' ' . $split[0];
+
+							$num = date('N', strtotime($tanggal));
+							$jam = date('H:i', strtotime($tanggal));
+							return $hari[$num] . ', ' . $tgl_indo;
+						}
+
+						$no = 0;
+					?>
+					<?php foreach ($data_perwalian_mahasiswa->result() as $key): ?>
+						<tr>
+							<td scope="col"><?= ++$no; ?></td>
+							<td scope="col"><?= tanggal_indo($key->tanggal) ?></td>
+							<td scope="col"><?= $key->jenis ?></td>
+							<td scope="col"><?= $key->uraian ?></td>
+							<td scope="col">
+								<?php if ($status == 'done' && !empty($tanda_tangan)): ?>
+									<img src="<?= base_url('assets/images/tanda_tangan/'.$tanda_tangan); ?>" style="width:100px;display:block;margin:auto;" alt="">
+								<?php endif; ?>
+							</td>
+						</tr>
+					<?php endforeach; ?>
+
+					<?php if ($no < 5): ?>
+						<?php
+							for ($i=0; $i <= $no; $i++) {
+								?>
+									<tr>
+										<th scope="col"></th>
+										<th scope="col"></th>
+										<th scope="col"></th>
+										<th scope="col"></th>
+										<th scope="col"></th>
+									</tr>
+								<?php
+							}
+						?>
+					<?php endif; ?>
+				<?php else: ?>
+					<tr>
+						<th scope="col"></th>
+						<th scope="col"></th>
+						<th scope="col"></th>
+						<th scope="col"></th>
+						<th scope="col"></th>
+					</tr>
+					<tr>
+						<th scope="col"></th>
+						<th scope="col"></th>
+						<th scope="col"></th>
+						<th scope="col"></th>
+						<th scope="col"></th>
+					</tr>
+					<tr>
+						<th scope="col"></th>
+						<th scope="col"></th>
+						<th scope="col"></th>
+						<th scope="col"></th>
+						<th scope="col"></th>
+					</tr>
+					<tr>
+						<th scope="col"></th>
+						<th scope="col"></th>
+						<th scope="col"></th>
+						<th scope="col"></th>
+						<th scope="col"></th>
+					</tr>
+					<tr>
+						<th scope="col"></th>
+						<th scope="col"></th>
+						<th scope="col"></th>
+						<th scope="col"></th>
+						<th scope="col"></th>
+					</tr>
+				<?php endif; ?>
+			</table>
+		</center>
 </body>
 </html>

@@ -21,7 +21,7 @@
         <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
             <div class="info-box bg-pink hover-expand-effect">
                 <div class="icon">
-                    <i class="material-icons">playlist_add_check</i>
+                    <i class="material-icons">done_all</i>
                 </div>
                 <div class="content">
                     <div class="text">Semua Jadwal</div>
@@ -32,7 +32,7 @@
         <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
             <div class="info-box bg-cyan hover-expand-effect">
                 <div class="icon">
-                    <i class="material-icons">help</i>
+                    <i class="material-icons">forum</i>
                 </div>
                 <div class="content">
                     <div class="text">Sedang Berlangsung</div>
@@ -43,7 +43,7 @@
         <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
             <div class="info-box bg-light-green hover-expand-effect">
                 <div class="icon">
-                    <i class="material-icons">forum</i>
+                    <i class="material-icons">playlist_add_check</i>
                 </div>
                 <div class="content">
                     <div class="text">Selesai</div>
@@ -54,7 +54,7 @@
         <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
             <div class="info-box bg-orange hover-expand-effect">
                 <div class="icon">
-                    <i class="material-icons">person_add</i>
+                    <i class="material-icons">help</i>
                 </div>
                 <div class="content">
                     <div class="text">Sedang Menunggu</div>

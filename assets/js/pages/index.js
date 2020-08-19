@@ -9,7 +9,7 @@
         }
     });
 
-    initDonutChart();
+    // initDonutChart();
     initSparkline();
 });
 

@@ -8,7 +8,7 @@ class Jadwal_Perwalian extends CI_Controller
         parent::__construct();
         $this->load->model('user_model');
         if($this->user_model->isNotLogin()) redirect(site_url('login'));
-        
+
         $this->load->model("jadwal_perwalian_model");
         $this->load->library('form_validation');
         $this->load->library('pagination');
@@ -227,13 +227,38 @@ class Jadwal_Perwalian extends CI_Controller
     {
         $data = [];
         $data['data_perwalian'] = null;
+        $data['data_perwalian_mahasiswa'] = null;
         $data['id_perwalian'] = $id_perwalian;
         $model = $this->jadwal_perwalian_model;
 
         if ($id_perwalian) {
             $data["data_perwalian"] = $model->getDataPerwalian($id_perwalian);
+            $data["data_perwalian_mahasiswa"] = $model->getDataUraian($id_perwalian);
         }
 
         $this->load->view("app/jadwal_perwalian/form_perwalian", $data);
+    }
+
+    public function form_uraian($id)
+    {
+        if (!isset($id)) redirect(site_url('jadwal_perwalian'));
+
+        $model = $this->jadwal_perwalian_model;
+        $validation = $this->form_validation;
+        $validation->set_rules($model->rulesedituraian());
+
+        if ($validation->run()) {
+            $model->updateuraian();
+            $this->session->set_flashdata('success', 'Berhasil disimpan');
+        }
+        $data = [];
+
+        $data["data_uraian"] = $model->getDataUraian($id);
+        // echo $data["data_uraian"]->num_rows();
+        // exit();
+        if (!$data["data_uraian"]) show_404();
+        $data["jadwal_perwalian_id"] = $id;
+
+        $this->load->view("app/jadwal_perwalian/edit_form_uraian", $data);
     }
 }

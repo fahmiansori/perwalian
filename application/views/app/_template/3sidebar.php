@@ -64,21 +64,21 @@
                 <?php if($user->role==='1'):?>
                     <li class="<?php echo $this->uri->segment(1) == 'user'? 'active':'';?>">
                         <a href="<?= site_url('user') ?>">
-                            <i class="material-icons">text_fields</i>
+                            <i class="material-icons">verified_user</i>
                             <span>User Admin</span>
                         </a>
                     </li>
 
                     <li class="<?php echo $this->uri->segment(1) == 'dosen' && $this->uri->segment(2) != 'mahasiswabimbingan'? 'active':'';?>">
                         <a href="<?= site_url('dosen') ?>">
-                            <i class="material-icons">text_fields</i>
+                            <i class="material-icons">school</i>
                             <span>Dosen</span>
                         </a>
                     </li>
 
                     <li class="<?php echo $this->uri->segment(1) == 'mahasiswa'? 'active':'';?>">
                         <a href="<?= site_url('mahasiswa') ?>">
-                            <i class="material-icons">text_fields</i>
+                            <i class="material-icons">person</i>
                             <span>Mahasiswa</span>
                         </a>
                     </li>
@@ -117,7 +117,7 @@
                 <?php if($user->role==='2'):?>
                     <li class="<?php echo $this->uri->segment(2) == 'mahasiswabimbingan' || $this->uri->segment(2) == 'mahasiswa_bimbingan_detail'? 'active':'';?>">
                         <a href="<?= site_url('dosen/mahasiswabimbingan') ?>">
-                            <i class="material-icons">text_fields</i>
+                            <i class="material-icons">person_pin_circle</i>
                             <span>Mahasiswa Bimbingan</span>
                         </a>
                     </li>

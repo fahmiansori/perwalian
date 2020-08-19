@@ -50,8 +50,25 @@ class Jadwal_Perwalian_Model extends CI_Model
             'label' => 'ID Jadwal',
             'rules' => 'required'],
 
-            ['field' => 'isi_perwalian',
-            'label' => 'Isi Perwalian',
+            // ['field' => 'isi_perwalian',
+            // 'label' => 'Isi Perwalian',
+            // 'rules' => 'required'],
+        ];
+    }
+
+    public function rulesedituraian()
+    {
+        return [
+            ['field' => 'jadwal_perwalian_id',
+            'label' => 'ID Jadwal',
+            'rules' => 'required'],
+
+            ['field' => 'jenis[]',
+            'label' => 'Jenis',
+            'rules' => 'required'],
+
+            ['field' => 'uraian[]',
+            'label' => 'Uraian',
             'rules' => 'required'],
         ];
     }
@@ -143,7 +160,7 @@ class Jadwal_Perwalian_Model extends CI_Model
         // ->where($this->_table.'.id', $id)
         // ->row();
 
-        return $this->db->query('SELECT '.$this->_table.'.*, dosen.nama_dosen, mahasiswa.nama_mahasiswa, users.full_name, perwalian.isi_perwalian from '.$this->_table.' inner join dosen on dosen.id = '.$this->_table.'.dosen_id inner join mahasiswa on mahasiswa.nim = '.$this->_table.'.nim inner join users on users.id = '.$this->_table.'.user_id left join perwalian on perwalian.jadwal_perwalian_id = '.$this->_table.'.id where '.$this->_table.'.id = '. $id)->row();
+        return $this->db->query('SELECT '.$this->_table.'.*, dosen.nama_dosen, dosen.tanda_tangan, mahasiswa.nama_mahasiswa, users.full_name, perwalian.isi_perwalian from '.$this->_table.' inner join dosen on dosen.id = '.$this->_table.'.dosen_id inner join mahasiswa on mahasiswa.nim = '.$this->_table.'.nim inner join users on users.id = '.$this->_table.'.user_id left join perwalian on perwalian.jadwal_perwalian_id = '.$this->_table.'.id where '.$this->_table.'.id = '. $id)->row();
     }
 
     public function save()
@@ -202,6 +219,51 @@ class Jadwal_Perwalian_Model extends CI_Model
         );
 
         return $this->db->update('perwalian', $data_update, array('id' => $post['id']));
+    }
+
+    public function getDataUraian($jadwal_perwalian_id)
+    {
+        if (empty($jadwal_perwalian_id)) {
+            return false;
+        }
+
+        $this->db->select('perwalian_mahasiswa.*');
+        $this->db->where('perwalian_mahasiswa.jadwal_perwalian_id', $jadwal_perwalian_id);
+        $this->db->from('perwalian_mahasiswa');
+        $this->db->join('jadwal_perwalian', 'jadwal_perwalian.id = perwalian_mahasiswa.jadwal_perwalian_id');
+
+        return $this->db->get();
+    }
+
+    public function updateuraian()
+    {
+        $post = $this->input->post();
+
+        $this->db->delete('perwalian_mahasiswa', array("jadwal_perwalian_id" => $post["jadwal_perwalian_id"]));
+
+        $data_jadwal =  $this->getById($post["jadwal_perwalian_id"]);
+
+        $post_jenis = $post["jenis"];
+        if (!empty($post_jenis)) {
+            $index = 0;
+            foreach ($post_jenis as $key) {
+                $data_insert = array(
+                    'jadwal_perwalian_id' => $post["jadwal_perwalian_id"],
+                    'tanggal' => $data_jadwal->waktu,
+                    'jenis' => $key,
+                    'uraian' => $post["uraian"][$index],
+                    'index' => ++$index,
+                    'status' => 1,
+                );
+
+                $this->db->insert('perwalian_mahasiswa', $data_insert);
+            }
+        }
+        else {
+            return false;
+        }
+
+        return TRUE;
     }
 
     public function delete($id)

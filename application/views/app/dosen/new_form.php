@@ -91,6 +91,20 @@
                             <?php } ?>
                         </div>
 
+                        <label for="tanda_tangan">Tanda Tangan (disarankan ukuran square 300x300 px)</label>
+                        <div class="form-group">
+                            <div class="form-line">
+                                <input onchange="loadFile(event)" type="file" id="tanda_tangan" name="tanda_tangan" class="form-control <?php echo form_error('tanda_tangan') ? 'error':'' ?>" placeholder="Upload tanda tangan">
+                            </div>
+                            <div class="">
+                                <img id="output" style="width:150px;display:block;margin:auto;"/>
+                            </div>
+
+                            <?php if(form_error('tanda_tangan')){ ?>
+                                <label id="tanda_tangan-error" class="error" for="tanda_tangan"><?php echo form_error('tanda_tangan') ?></label>
+                            <?php } ?>
+                        </div>
+
                         <br>
                         <button type="submit" class="btn btn-primary m-t-15 waves-effect">Simpan</button>
                     </form>
@@ -106,6 +120,15 @@
 <?php $this->load->view('app/_template/5js.php'); ?>
 <!-- JS HERE -->
 <script src="<?php echo base_url('assets/plugins/bootstrap-select/js/bootstrap-select.js'); ?>"></script>
+<script type="text/javascript">
+    var loadFile = function(event) {
+        var output = document.getElementById('output');
+        output.src = URL.createObjectURL(event.target.files[0]);
+        output.onload = function() {
+            URL.revokeObjectURL(output.src) // free memory
+        }
+    };
+</script>
 <!-- #END JS HERE -->
 
 

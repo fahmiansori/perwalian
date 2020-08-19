@@ -50,7 +50,7 @@
                         <label for="isi_perwalian">Isi Perwalian</label>
                         <div class="form-group">
                             <div class="form-line">
-                                <textarea type="text" id="isi_perwalian" name="isi_perwalian" class="form-control <?php echo form_error('isi_perwalian') ? 'error':'' ?>" placeholder="Masukkan isi perwalian yang dibahas" required rows="8" cols="80"><?php echo $data_detail_perwalian->isi_perwalian; ?></textarea>
+                                <textarea type="text" id="isi_perwalian" name="isi_perwalian" class="form-control <?php echo form_error('isi_perwalian') ? 'error':'' ?>" placeholder="Masukkan isi perwalian yang dibahas" rows="8" cols="80"><?php echo $data_detail_perwalian->isi_perwalian; ?></textarea>
                             </div>
 
                             <?php if(form_error('isi_perwalian')){ ?>

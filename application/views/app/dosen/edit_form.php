@@ -80,6 +80,25 @@
                             <?php } ?>
                         </div>
 
+                        <label for="tanda_tangan">Tanda Tangan (disarankan ukuran square 300x300 px)</label>
+                        <div class="form-group">
+                            <div class="form-line">
+                                <input type="hidden" name="old_tanda_tangan" value="<?= $data_detail->tanda_tangan ?>">
+                                <input onchange="loadFile(event)" type="file" id="tanda_tangan" name="tanda_tangan" class="form-control <?php echo form_error('tanda_tangan') ? 'error':'' ?>" placeholder="Upload tanda tangan">
+                            </div>
+                            <div class="">
+                                <?php if (!empty($data_detail->tanda_tangan)): ?>
+                                    <img id="output" src="<?= base_url('assets/images/tanda_tangan/'.$data_detail->tanda_tangan); ?>" style="width:150px;display:block;margin:auto;" alt="" />
+                                <?php else: ?>
+                                    <img id="output" style="width:150px;display:block;margin:auto;" />
+                                <?php endif; ?>
+                            </div>
+
+                            <?php if(form_error('tanda_tangan')){ ?>
+                                <label id="tanda_tangan-error" class="error" for="tanda_tangan"><?php echo form_error('tanda_tangan') ?></label>
+                            <?php } ?>
+                        </div>
+
                         <br>
                         <button type="submit" class="btn btn-primary m-t-15 waves-effect">Simpan</button>
                     </form>
@@ -93,6 +112,15 @@
 
 <?php $this->load->view('app/_template/5js.php'); ?>
 <!-- JS HERE -->
+<script type="text/javascript">
+    var loadFile = function(event) {
+        var output = document.getElementById('output');
+        output.src = URL.createObjectURL(event.target.files[0]);
+        output.onload = function() {
+            URL.revokeObjectURL(output.src) // free memory
+        }
+    };
+</script>
 <!-- #END JS HERE -->
 
 
