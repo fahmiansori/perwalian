@@ -16,8 +16,10 @@
 <?php
     $user_logged = $this->session->userdata("user_logged");
     $mahasiswa_id = '';
+    $dosen_id = '';
     if ($user_logged->role === '3') {
         $mahasiswa_ = $this->db->get_where('mahasiswa', ["user_id" => $user_logged->id])->row();
+        $dosen_id = $mahasiswa_->dosen_id;
         $mahasiswa_id = $mahasiswa_->nim;
     }
 ?>
@@ -62,7 +64,7 @@
                                 <select id="dosen_id" name="dosen_id" class="form-control show-tick <?php echo form_error('dosen_id') ? 'error':'' ?>" required>
                                     <option value="">-- Please select --</option>
                                     <?php foreach ($dosen as $row): ?>
-                                        <option value="<?php echo $row->id; ?>"><?php echo $row->nama_dosen; ?></option>
+                                        <option value="<?php echo $row->id; ?>" <?= ($row->id == $dosen_id)? 'selected':'' ?>><?php echo $row->nama_dosen; ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
