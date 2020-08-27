@@ -1,5 +1,27 @@
 <?php
     $user = $this->session->userdata("user_logged");
+
+    if ($user && $user->role === '2') {
+        $dosen = $this->db->get_where('dosen', ["user_id" => $user->id])->row();
+        $this->db->where('jadwal_perwalian.dosen_id', $dosen->id);
+    }else if ($user && $user->role === '3') {
+        $mahasiswa = $this->db->get_where('mahasiswa', ["user_id" => $user->id])->row();
+        $this->db->where('jadwal_perwalian.nim', $mahasiswa->nim);
+    }
+    $this->db->from('jadwal_perwalian');
+    $this->db->where('jadwal_perwalian.status', 'waitingapproval');
+    $total_waitingapproval = $this->db->count_all_results();
+
+    if ($user && $user->role === '2') {
+        $dosen = $this->db->get_where('dosen', ["user_id" => $user->id])->row();
+        $this->db->where('jadwal_perwalian.dosen_id', $dosen->id);
+    }else if ($user && $user->role === '3') {
+        $mahasiswa = $this->db->get_where('mahasiswa', ["user_id" => $user->id])->row();
+        $this->db->where('jadwal_perwalian.nim', $mahasiswa->nim);
+    }
+    $this->db->from('jadwal_perwalian');
+    $this->db->where('jadwal_perwalian.waktu like \'%'. date('Y-m-d') .'%\'');
+    $total_today = $this->db->count_all_results();
 ?>
 
 <section>
@@ -82,36 +104,6 @@
                             <span>Mahasiswa</span>
                         </a>
                     </li>
-
-                    <li class="<?php echo $this->uri->segment(1) == 'jadwal_perwalian'? 'active':'';?>">
-                        <a href="javascript:void(0);" class="menu-toggle">
-                            <i class="material-icons">assignment</i>
-                            <span>Jadwal Perwalian</span>
-                        </a>
-
-                        <ul class="ml-menu">
-                            <li class="<?php echo $this->uri->segment(1) == 'jadwal_perwalian'&&empty($this->uri->segment(2))? 'active':'';?>">
-                                <a href="<?= site_url('jadwal_perwalian') ?>">Semua</a>
-                            </li>
-
-                            <li class="<?php echo $this->uri->segment(2) == 'menunggu'? 'active':'';?>">
-                                <a href="<?= site_url('jadwal_perwalian/menunggu') ?>">Menunggu</a>
-                            </li>
-                            <li class="<?php echo $this->uri->segment(2) == 'dibatalkan'? 'active':'';?>">
-                                <a href="<?= site_url('jadwal_perwalian/dibatalkan') ?>">Dibatalkan</a>
-                            </li>
-                            <li class="<?php echo $this->uri->segment(2) == 'telah_lewat'? 'active':'';?>">
-                                <a href="<?= site_url('jadwal_perwalian/telah_lewat') ?>">Telah lewat</a>
-                            </li>
-                            <li class="<?php echo $this->uri->segment(2) == 'berlangsung'? 'active':'';?>">
-                                <a href="<?= site_url('jadwal_perwalian/berlangsung') ?>">Sedang berlangsung</a>
-                            </li>
-                            <li class="<?php echo $this->uri->segment(2) == 'selesai'? 'active':'';?>">
-                                <a href="<?= site_url('jadwal_perwalian/selesai') ?>">Selesai</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="header"></li>
                 <?php endif;?>
 
                 <?php if($user->role==='2'):?>
@@ -121,69 +113,64 @@
                             <span>Mahasiswa Bimbingan</span>
                         </a>
                     </li>
-
-                    <li class="<?php echo $this->uri->segment(1) == 'jadwal_perwalian'? 'active':'';?>">
-                        <a href="javascript:void(0);" class="menu-toggle">
-                            <i class="material-icons">assignment</i>
-                            <span>Jadwal Perwalian</span>
-                        </a>
-
-                        <ul class="ml-menu">
-                            <li class="<?php echo $this->uri->segment(1) == 'jadwal_perwalian'&&empty($this->uri->segment(2))? 'active':'';?>">
-                                <a href="<?= site_url('jadwal_perwalian') ?>">Semua</a>
-                            </li>
-
-                            <li class="<?php echo $this->uri->segment(2) == 'menunggu'? 'active':'';?>">
-                                <a href="<?= site_url('jadwal_perwalian/menunggu') ?>">Menunggu</a>
-                            </li>
-                            <li class="<?php echo $this->uri->segment(2) == 'dibatalkan'? 'active':'';?>">
-                                <a href="<?= site_url('jadwal_perwalian/dibatalkan') ?>">Dibatalkan</a>
-                            </li>
-                            <li class="<?php echo $this->uri->segment(2) == 'telah_lewat'? 'active':'';?>">
-                                <a href="<?= site_url('jadwal_perwalian/telah_lewat') ?>">Telah lewat</a>
-                            </li>
-                            <li class="<?php echo $this->uri->segment(2) == 'berlangsung'? 'active':'';?>">
-                                <a href="<?= site_url('jadwal_perwalian/berlangsung') ?>">Sedang berlangsung</a>
-                            </li>
-                            <li class="<?php echo $this->uri->segment(2) == 'selesai'? 'active':'';?>">
-                                <a href="<?= site_url('jadwal_perwalian/selesai') ?>">Selesai</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="header"></li>
                 <?php endif;?>
 
                 <?php if($user->role==='3'):?>
-                    <li class="<?php echo $this->uri->segment(1) == 'jadwal_perwalian'? 'active':'';?>">
-                        <a href="javascript:void(0);" class="menu-toggle">
-                            <i class="material-icons">assignment</i>
-                            <span>Jadwal Perwalian</span>
-                        </a>
-
-                        <ul class="ml-menu">
-                            <li class="<?php echo $this->uri->segment(1) == 'jadwal_perwalian'&&empty($this->uri->segment(2))? 'active':'';?>">
-                                <a href="<?= site_url('jadwal_perwalian') ?>">Semua</a>
-                            </li>
-
-                            <li class="<?php echo $this->uri->segment(2) == 'menunggu'? 'active':'';?>">
-                                <a href="<?= site_url('jadwal_perwalian/menunggu') ?>">Menunggu</a>
-                            </li>
-                            <li class="<?php echo $this->uri->segment(2) == 'dibatalkan'? 'active':'';?>">
-                                <a href="<?= site_url('jadwal_perwalian/dibatalkan') ?>">Dibatalkan</a>
-                            </li>
-                            <li class="<?php echo $this->uri->segment(2) == 'telah_lewat'? 'active':'';?>">
-                                <a href="<?= site_url('jadwal_perwalian/telah_lewat') ?>">Telah lewat</a>
-                            </li>
-                            <li class="<?php echo $this->uri->segment(2) == 'berlangsung'? 'active':'';?>">
-                                <a href="<?= site_url('jadwal_perwalian/berlangsung') ?>">Sedang berlangsung</a>
-                            </li>
-                            <li class="<?php echo $this->uri->segment(2) == 'selesai'? 'active':'';?>">
-                                <a href="<?= site_url('jadwal_perwalian/selesai') ?>">Selesai</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="header"></li>
                 <?php endif;?>
+
+                <li class="<?php echo $this->uri->segment(1) == 'jadwal_perwalian'? 'active':'';?>">
+                    <a href="javascript:void(0);" class="menu-toggle">
+                        <i class="material-icons">assignment</i>
+                        <span>
+                            Jadwal Perwalian
+                            <?php if ($total_today > 0): ?>
+                                <span class="badge bg-pink" style="color:#fff;"><?= $total_today ?></span>
+                            <?php endif; ?>
+                            <?php if ($total_waitingapproval > 0): ?>
+                                <span class="badge bg-brown" style="color:#fff;"><?= $total_waitingapproval ?></span>
+                            <?php endif; ?>
+                        </span>
+                    </a>
+
+                    <ul class="ml-menu">
+                        <li class="<?php echo $this->uri->segment(1) == 'jadwal_perwalian'&&empty($this->uri->segment(2))? 'active':'';?>">
+                            <a href="<?= site_url('jadwal_perwalian') ?>">Semua</a>
+                        </li>
+
+                        <li class="<?php echo $this->uri->segment(2) == 'hari_ini'? 'active':'';?>">
+                            <a href="<?= site_url('jadwal_perwalian/hari_ini') ?>">
+                                Hari ini
+                                <?php if ($total_today > 0): ?>
+                                    <span class="badge bg-pink" style="color:#fff;"><?= $total_today ?></span>
+                                <?php endif; ?>
+                            </a>
+                        </li>
+                        <li class="<?php echo $this->uri->segment(2) == 'menunggu_persetujuan'? 'active':'';?>">
+                            <a href="<?= site_url('jadwal_perwalian/menunggu_persetujuan') ?>">
+                                Menunggu Jadwal
+                                <?php if ($total_waitingapproval > 0): ?>
+                                    <span class="badge bg-brown" style="color:#fff;"><?= $total_waitingapproval ?></span>
+                                <?php endif; ?>
+                            </a>
+                        </li>
+                        <li class="<?php echo $this->uri->segment(2) == 'menunggu'? 'active':'';?>">
+                            <a href="<?= site_url('jadwal_perwalian/menunggu') ?>">Menunggu</a>
+                        </li>
+                        <li class="<?php echo $this->uri->segment(2) == 'dibatalkan'? 'active':'';?>">
+                            <a href="<?= site_url('jadwal_perwalian/dibatalkan') ?>">Dibatalkan</a>
+                        </li>
+                        <li class="<?php echo $this->uri->segment(2) == 'telah_lewat'? 'active':'';?>">
+                            <a href="<?= site_url('jadwal_perwalian/telah_lewat') ?>">Telah Lewat</a>
+                        </li>
+                        <li class="<?php echo $this->uri->segment(2) == 'berlangsung'? 'active':'';?>">
+                            <a href="<?= site_url('jadwal_perwalian/berlangsung') ?>">Sedang Berlangsung</a>
+                        </li>
+                        <li class="<?php echo $this->uri->segment(2) == 'selesai'? 'active':'';?>">
+                            <a href="<?= site_url('jadwal_perwalian/selesai') ?>">Selesai</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="header"></li>
             </ul>
         </div>
         <!-- #Menu -->

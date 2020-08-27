@@ -126,6 +126,13 @@ class User_Model extends CI_Model
         $this->role = $post["role"];
         // $this->photo = $post["photo"];
         $this->is_active = 1;
+        /**
+         * Role
+         * 1. Admin
+         * 2. Dosen
+         * 3. Mahasiswa
+         */
+
         return $this->db->insert($this->_table, $this);
     }
 

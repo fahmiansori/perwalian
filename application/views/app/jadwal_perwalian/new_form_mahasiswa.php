@@ -13,6 +13,14 @@
 
 <?php $this->load->view('app/_template/4content.php'); ?>
 <!-- CONTENT HERE -->
+<?php
+    $user_logged = $this->session->userdata("user_logged");
+    $mahasiswa_id = '';
+    if ($user_logged->role === '3') {
+        $mahasiswa_ = $this->db->get_where('mahasiswa', ["user_id" => $user_logged->id])->row();
+        $mahasiswa_id = $mahasiswa_->nim;
+    }
+?>
 <div class="">
     <?php if ($this->session->flashdata('success')): ?>
         <div class="alert alert-success" role="alert">
@@ -26,12 +34,13 @@
         </div>
     <?php endif; ?>
 
+    <!-- Vertical Layout -->
     <div class="row clearfix">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <div class="card">
                 <div class="header">
                     <h2>
-                        EDIT <?= ucwords(implode(' ',explode('_',$this->uri->segment(1)))) ?>
+                        NEW Pengajuan Bimbingan
                     </h2>
                     <ul class="header-dropdown m-r--5">
                         <li class="dropdown">
@@ -46,33 +55,14 @@
                 </div>
 
                 <div class="body">
-                    <form action="" method="post" enctype="multipart/form-data">
-                        <input type="hidden" name="id" value="<?php echo $data_detail->id; ?>" />
-
-                        <label for="waktu">Waktu</label>
-                        <div class="form-group">
-                            <div class="form-line">
-                                <?php
-                                    $date_schedule = '';
-                                    if (!empty($data_detail->waktu)) {
-                                        $date_schedule = date('H:i d F Y', strtotime($data_detail->waktu));
-                                    }
-                                ?>
-                                <input value="<?php echo $date_schedule; ?>" type="text" id="waktu" name="waktu" class="form-control datetimepicker <?php echo form_error('waktu') ? 'error':'' ?>" placeholder="Masukkan Waktu" required>
-                            </div>
-
-                            <?php if(form_error('waktu')){ ?>
-                                <label id="waktu-error" class="error" for="waktu"><?php echo form_error('waktu') ?></label>
-                            <?php } ?>
-                        </div>
-
+                    <form action="<?php echo site_url('jadwal_perwalian/add') ?>" method="post" enctype="multipart/form-data" >
                         <label for="dosen_id">Dosen</label>
                         <div class="form-group">
                             <div class="form-line">
                                 <select id="dosen_id" name="dosen_id" class="form-control show-tick <?php echo form_error('dosen_id') ? 'error':'' ?>" required>
                                     <option value="">-- Please select --</option>
                                     <?php foreach ($dosen as $row): ?>
-                                        <option value="<?php echo $row->id; ?>" <?php echo $data_detail->dosen_id==$row->id ? 'selected':'' ?>><?php echo $row->nama_dosen; ?></option>
+                                        <option value="<?php echo $row->id; ?>"><?php echo $row->nama_dosen; ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
@@ -88,7 +78,11 @@
                                 <select id="nim" name="nim" class="form-control show-tick <?php echo form_error('nim') ? 'error':'' ?>" required>
                                     <option value="">-- Please select --</option>
                                     <?php foreach ($mahasiswa as $row): ?>
-                                        <option value="<?php echo $row->nim; ?>" <?php echo $data_detail->nim==$row->nim ? 'selected':'' ?>><?php echo $row->nama_mahasiswa; ?></option>
+                                        <?php if ($user_logged->role === '3' && $mahasiswa_id==$row->nim): ?>
+                                            <option value="<?php echo $row->nim; ?>" <?php echo ($mahasiswa_id==$row->nim)? 'selected':''; ?>><?php echo $row->nama_mahasiswa; ?></option>
+                                        <?php else: ?>
+                                            <option value="<?php echo $row->nim; ?>"><?php echo $row->nama_mahasiswa; ?></option>
+                                        <?php endif; ?>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
@@ -101,7 +95,7 @@
                         <label for="semester">Semester Mahasiswa</label>
                         <div class="form-group">
                             <div class="form-line">
-                                <input value="<?php echo $data_detail->semester; ?>" type="number" id="semester" name="semester" class="form-control <?php echo form_error('semester') ? 'error':'' ?>" placeholder="Masukkan semester" required>
+                                <input type="number" id="semester" name="semester" class="form-control <?php echo form_error('semester') ? 'error':'' ?>" placeholder="Masukkan semester" required>
                             </div>
 
                             <?php if(form_error('semester')){ ?>
@@ -116,6 +110,7 @@
             </div>
         </div>
     </div>
+    <!-- #END# Vertical Layout -->
 </div>
 <!-- #END CONTENT HERE -->
 

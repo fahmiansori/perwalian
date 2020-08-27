@@ -37,6 +37,10 @@
                       <?php
                           function tanggal_indo($tanggal)
                           {
+                              if (empty($tanggal)) {
+                                  return '-';
+                              }
+
                               $hari = array ( 1 =>    'Senin',
                                   'Selasa',
                                   'Rabu',
@@ -77,9 +81,7 @@
                               <i class="material-icons">more_vert</i>
                           </a>
                           <ul class="dropdown-menu pull-right">
-                              <?php if (isset($user) && $user && $user->role === '1' || isset($user) && $user && $user->role === '2'): ?>
-                                  <li><a href="<?php echo site_url('jadwal_perwalian/add') ?>">Add</a></li>
-                              <?php endif; ?>
+                              <li><a href="<?php echo site_url('jadwal_perwalian/add') ?>">Tambah Jadwal</a></li>
                           </ul>
                       </li>
                   </ul>
@@ -133,6 +135,9 @@
                                               $this->db->update('jadwal_perwalian', $data_update, array('id' => $row->id));
                                           }else {
                                               switch ($row->status) {
+                                                  case 'waitingapproval':
+                                                  echo "<span class='label bg-brown'>Menunggu Persetujuan</span>";
+                                                  break;
                                                   case 'waiting':
                                                   echo "<span class='label label-warning'>Menunggu</span>";
                                                   break;
@@ -160,52 +165,60 @@
                                           <?php echo $row->isi_perwalian ?>
                                       </td>
                                       <td>
-                                          <?php if (isset($user) && $user && $user->role === '1' || isset($user) && $user && $user->role === '2'): ?>
-                                              <?php if(date('Y-m-d', strtotime($today)) <= date('Y-m-d',strtotime($row->waktu)) && $row->status == 'waiting'):?>
-                                                  <a href="<?php echo site_url('jadwal_perwalian/batalkan/'.$row->id.'/'.$this->uri->segment(2)) ?>"
-                                                      class="btn btn-small text-warning"><i class="material-icons">stop</i> Batalkan
+                                          <?php if ($row->status == 'waitingapproval'): ?>
+                                              <?php if (isset($user) && $user && ($user->role === '1' || $user->role === '2')): ?>
+                                                  <a href="<?php echo site_url('jadwal_perwalian/edit/'.$row->id) ?>"
+                                                      class="btn btn-small col-pink"><i class="material-icons">perm_contact_calendar</i> Tentukan Waktu
                                                   </a>
+                                              <?php endif; ?>
+                                          <?php else: ?>
+                                              <?php if (isset($user) && $user && $user->role === '1' || isset($user) && $user && $user->role === '2'): ?>
+                                                  <?php if(date('Y-m-d', strtotime($today)) <= date('Y-m-d',strtotime($row->waktu)) && $row->status == 'waiting'):?>
+                                                      <a href="<?php echo site_url('jadwal_perwalian/batalkan/'.$row->id.'/'.$this->uri->segment(2)) ?>"
+                                                          class="btn btn-small text-warning"><i class="material-icons">stop</i> Batalkan
+                                                      </a>
 
-                                                  <?php if(date('Y-m-d', strtotime($today)) == date('Y-m-d',strtotime($row->waktu)) && $row->status == 'waiting'):?>
-                                                      <a href="<?php echo site_url('jadwal_perwalian/bimbingan/'.$row->id) ?>"
-                                                          class="btn btn-small text-info"><i class="material-icons">skip_next</i> Sedang bimbingan
+                                                      <?php if(date('Y-m-d', strtotime($today)) == date('Y-m-d',strtotime($row->waktu)) && $row->status == 'waiting'):?>
+                                                          <a href="<?php echo site_url('jadwal_perwalian/bimbingan/'.$row->id) ?>"
+                                                              class="btn btn-small col-teal"><i class="material-icons">skip_next</i> Sedang bimbingan
+                                                          </a>
+                                                      <?php endif;?>
+
+                                                      <a href="<?php echo site_url('jadwal_perwalian/edit/'.$row->id) ?>"
+                                                          class="btn btn-small"><i class="material-icons">gesture</i> Edit
+                                                      </a>
+
+                                                      <?php if (isset($user) && $user && $user->role === '1'): ?>
+                                                          <a onclick="deleteConfirm('<?php echo site_url('jadwal_perwalian/delete/'.$row->id) ?>')"
+                                                              href="#!" class="btn btn-small text-danger"><i class="material-icons">delete_forever</i> Hapus
+                                                          </a>
+                                                      <?php endif; ?>
+                                                  <?php endif;?>
+
+                                                  <?php if($row->status == 'onprocess'):?>
+                                                      <a href="<?php echo site_url('jadwal_perwalian/selesaikan/'.$row->id) ?>"
+                                                          class="btn btn-small text-success"><i class="material-icons">check</i> Selesai
                                                       </a>
                                                   <?php endif;?>
 
-                                                  <a href="<?php echo site_url('jadwal_perwalian/edit/'.$row->id) ?>"
-                                                      class="btn btn-small"><i class="material-icons">gesture</i> Edit
-                                                  </a>
+                                                  <?php if($row->status == 'done'):?>
+                                                      <a href="<?php echo site_url('jadwal_perwalian/editisi/'.$row->id) ?>"
+                                                          class="btn btn-small col-cyan"><i class="material-icons">gesture</i> Edit Isi
+                                                      </a>
+                                                  <?php endif;?>
+                                              <?php endif; ?>
 
-                                                  <?php if (isset($user) && $user && $user->role === '1'): ?>
-                                                      <a onclick="deleteConfirm('<?php echo site_url('jadwal_perwalian/delete/'.$row->id) ?>')"
-                                                          href="#!" class="btn btn-small text-danger"><i class="material-icons">delete_forever</i> Hapus
+                                              <?php if (date('Y-m-d', strtotime($today)) <= date('Y-m-d',strtotime($row->waktu)) && isset($user) && $user && $user->role === '3'): ?>
+                                                  <?php if ($row->status == 'waiting'): ?>
+                                                      <a href="<?php echo site_url('jadwal_perwalian/form_uraian/'.$row->id) ?>" class="btn btn-small text-success">
+                                                          <i class="material-icons">textsms</i> Isi uraian
                                                       </a>
                                                   <?php endif; ?>
-                                              <?php endif;?>
-
-                                              <?php if($row->status == 'onprocess'):?>
-                                                  <a href="<?php echo site_url('jadwal_perwalian/selesaikan/'.$row->id) ?>"
-                                                      class="btn btn-small text-success"><i class="material-icons">check</i> Selesai
-                                                  </a>
-                                              <?php endif;?>
-
-                                              <?php if($row->status == 'done'):?>
-                                                  <a href="<?php echo site_url('jadwal_perwalian/editisi/'.$row->id) ?>"
-                                                      class="btn btn-small text-success"><i class="material-icons">gesture</i> Edit Isi
-                                                  </a>
-                                              <?php endif;?>
-                                          <?php endif; ?>
-
-                                          <?php if (date('Y-m-d', strtotime($today)) <= date('Y-m-d',strtotime($row->waktu)) && isset($user) && $user && $user->role === '3'): ?>
-                                              <?php if ($row->status == 'waiting'): ?>
-                                                  <a href="<?php echo site_url('jadwal_perwalian/form_uraian/'.$row->id) ?>" class="btn btn-small text-success">
-                                                      <i class="material-icons">print</i> Isi uraian
-                                                  </a>
                                               <?php endif; ?>
-                                          <?php endif; ?>
 
-                                          <a href="<?php echo site_url('jadwal_perwalian/form_perwalian/'.$row->id) ?>" class="btn btn-small text-success"><i class="material-icons">print</i> Print
-                                          </a>
+                                              <a href="<?php echo site_url('jadwal_perwalian/form_perwalian/'.$row->id) ?>" class="btn btn-small text-success"><i class="material-icons">print</i> Print
+                                              </a>
+                                          <?php endif; ?>
                                       </td>
                                   </tr>
                               <?php endforeach; ?>

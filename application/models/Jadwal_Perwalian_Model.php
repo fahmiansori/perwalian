@@ -103,9 +103,9 @@ class Jadwal_Perwalian_Model extends CI_Model
         return $query;
     }
 
-    public function getWithPaginationCondition($limit, $start, $cond='')
+    public function getWithPaginationCondition($limit, $start, $cond='', $date='')
     {
-        if (empty($cond)) {
+        if (empty($cond) && empty($date)) {
             return $this->getWithPagination($limit, $start);
         }
         $user = $this->session->userdata("user_logged");
@@ -118,13 +118,19 @@ class Jadwal_Perwalian_Model extends CI_Model
             $this->db->where($this->_table.'.nim', $mahasiswa->nim);
         }
 
+        if (!empty($date)) {
+            $this->db->where($this->_table.'.waktu like \'%'. $date .'%\'');
+        }
+        if (!empty($cond)) {
+            $this->db->where($this->_table.'.status', $cond);
+        }
+
         $this->db->select($this->_table.'.*, dosen.nama_dosen, mahasiswa.nama_mahasiswa, users.full_name, perwalian.isi_perwalian')
          ->from($this->_table)
          ->join('dosen', 'dosen.id = '.$this->_table.'.dosen_id')
          ->join('mahasiswa', 'mahasiswa.nim = '.$this->_table.'.nim')
          ->join('users', 'users.id = '.$this->_table.'.user_id')
          ->join('perwalian', 'perwalian.jadwal_perwalian_id = '.$this->_table.'.id', 'left')
-         ->where($this->_table.'.status', $cond)
          ->order_by($this->_table.'.waktu', 'desc')
          ->limit($limit, $start);
 
@@ -132,13 +138,19 @@ class Jadwal_Perwalian_Model extends CI_Model
         return $query;
     }
 
-    public function countDataCondition($cond='')
+    public function countDataCondition($cond='', $date='')
     {
-        if (empty($cond)) {
+        if (empty($cond) && empty($date)) {
             return 0;
         }
 
-        $this->db->where($this->_table.'.status', $cond);
+        if (!empty($cond)) {
+            $this->db->where($this->_table.'.status', $cond);
+        }
+
+        if (!empty($date)) {
+            $this->db->where($this->_table.'.waktu like \'%'. $date .'%\'');
+        }
         $this->db->from($this->_table);
 
         return $this->db->count_all_results();
@@ -168,15 +180,16 @@ class Jadwal_Perwalian_Model extends CI_Model
         $post = $this->input->post();
 
         $user_logged_id = $this->session->userdata("user_logged");
-        $admin_id = (int)$user_logged_id->id;
+        $user_id = (int)$user_logged_id->id;
+        $role = $user_logged_id->role;
 
-        $waktu = $post["waktu"];
+        $waktu = isset($post["waktu"])? $post["waktu"]:date('Y-m-d H:i:s');
         $waktu = date('Y-m-d H:i:s', strtotime($waktu));
 
         $data_insert = array(
             'nim' => $post["nim"],
             'dosen_id' => $post["dosen_id"],
-            'user_id' => $admin_id,
+            'user_id' => $user_id,
             'waktu' => $waktu,
             'status' => 'waiting',
             'semester' => $post["semester"],
@@ -188,17 +201,34 @@ class Jadwal_Perwalian_Model extends CI_Model
          * 3. expired
          * 4. onprocess
          * 5. done
+         * 6. waitingapproval
          */
+
+        // jika mahasiswa, mengajukan jadwal
+        if ($role === '3') {
+            $data_insert = array(
+                'nim' => $post["nim"],
+                'dosen_id' => $post["dosen_id"],
+                'user_id' => $user_id,
+                'status' => 'waitingapproval',
+                'semester' => $post["semester"],
+            );
+        }
 
         return $this->db->insert($this->_table, $data_insert);
     }
 
     public function update()
     {
+        $user_logged_id = $this->session->userdata("user_logged");
+        $role = $user_logged_id->role;
+
         $post = $this->input->post();
 
-        $waktu = $post["waktu"];
+        $waktu = isset($post["waktu"])? $post["waktu"]:date('Y-m-d H:i:s');
         $waktu = date('Y-m-d H:i:s', strtotime($waktu));
+
+        $data_edit = $this->db->get_where($this->_table, ["id" => $post['id']])->row();
 
         $data_update = array(
             'nim' => $post["nim"],
@@ -206,6 +236,19 @@ class Jadwal_Perwalian_Model extends CI_Model
             'waktu' => $waktu,
             'semester' => $post["semester"],
         );
+
+        if (($data_edit) && $role !== '3' && $data_edit->status == 'waitingapproval') {
+            $data_update['status'] = 'waiting';
+        }
+
+        // jika mahasiswa, edit mengajukan jadwal
+        if ($role === '3') {
+            $data_update = array(
+                'nim' => $post["nim"],
+                'dosen_id' => $post["dosen_id"],
+                'semester' => $post["semester"],
+            );
+        }
 
         return $this->db->update($this->_table, $data_update, array('id' => $post['id']));
     }

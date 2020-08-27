@@ -76,6 +76,7 @@ class Dashboard extends CI_Controller {
           ->join('mahasiswa', 'mahasiswa.nim = '.'jadwal_perwalian.nim')
           ->join('users', 'users.id = '.'jadwal_perwalian.user_id')
           ->join('perwalian', 'perwalian.jadwal_perwalian_id = '.'jadwal_perwalian.id','left')
+          ->where('jadwal_perwalian.status != \'waitingapproval\'')
           ->get();
 
         foreach ($data_->result() as $key) {

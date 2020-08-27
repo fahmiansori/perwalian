@@ -53,9 +53,9 @@ class Jadwal_Perwalian extends CI_Controller
         $this->load->view('app/jadwal_perwalian/list_page',$data);
     }
 
-    protected function indexcondition($cond,$page_active){
+    protected function indexcondition($page_active,$cond='',$date=''){
         $config['base_url'] = site_url('jadwal_perwalian/'.$page_active);
-        $config['total_rows'] = $this->jadwal_perwalian_model->countDataCondition($cond);
+        $config['total_rows'] = $this->jadwal_perwalian_model->countDataCondition($cond,$date);
         $config['per_page'] = 10;
         $config["uri_segment"] = 3;
         $choice = $config["total_rows"] / $config["per_page"];
@@ -83,7 +83,7 @@ class Jadwal_Perwalian extends CI_Controller
         $this->pagination->initialize($config);
         $data['page'] = ($this->uri->segment(3)) ? $this->uri->segment(3) : 0;
 
-        $data['data'] = $this->jadwal_perwalian_model->getWithPaginationCondition($config["per_page"], $data['page'], $cond);
+        $data['data'] = $this->jadwal_perwalian_model->getWithPaginationCondition($config["per_page"], $data['page'], $cond, $date);
 
         $data['pagination'] = $this->pagination->create_links();
 
@@ -94,23 +94,31 @@ class Jadwal_Perwalian extends CI_Controller
 
     public function menunggu()
     {
-        $this->indexcondition('waiting','menunggu');
+        $this->indexcondition('menunggu',$cond='waiting');
     }
     public function dibatalkan()
     {
-        $this->indexcondition('canceled','dibatalkan');
+        $this->indexcondition('dibatalkan',$cond='canceled');
     }
     public function telah_lewat()
     {
-        $this->indexcondition('expired','telah_lewat');
+        $this->indexcondition('telah_lewat',$cond='expired');
     }
     public function berlangsung()
     {
-        $this->indexcondition('onprocess','berlangsung');
+        $this->indexcondition('berlangsung',$cond='onprocess');
     }
     public function selesai()
     {
-        $this->indexcondition('done','selesai');
+        $this->indexcondition('selesai',$cond='done');
+    }
+    public function menunggu_persetujuan()
+    {
+        $this->indexcondition('menunggu_persetujuan',$cond='waitingapproval');
+    }
+    public function hari_ini()
+    {
+        $this->indexcondition('menunggu_persetujuan','' ,date('Y-m-d'));
     }
 
     protected function updatestatus($id, $url, $status)
@@ -183,7 +191,14 @@ class Jadwal_Perwalian extends CI_Controller
         $data['dosen'] = $this->db->get('dosen')->result();
         $data['mahasiswa'] = $this->db->get('mahasiswa')->result();
 
-        $this->load->view("app/jadwal_perwalian/new_form",$data);
+        $user_logged_id = $this->session->userdata("user_logged");
+        $role = $user_logged_id->role;
+
+        if ($role === '3') {
+            $this->load->view("app/jadwal_perwalian/new_form_mahasiswa",$data);
+        }else {
+            $this->load->view("app/jadwal_perwalian/new_form",$data);
+        }
     }
 
     public function edit($id = null)
@@ -205,7 +220,14 @@ class Jadwal_Perwalian extends CI_Controller
         $data["data_detail"] = $model->getById($id);
         if (!$data["data_detail"]) show_404();
 
-        $this->load->view("app/jadwal_perwalian/edit_form", $data);
+        $user_logged_id = $this->session->userdata("user_logged");
+        $role = $user_logged_id->role;
+
+        if ($role === '3') {
+            $this->load->view("app/jadwal_perwalian/edit_form_mahasiswa",$data);
+        }else {
+            $this->load->view("app/jadwal_perwalian/edit_form", $data);
+        }
     }
 
     public function delete($id=null)

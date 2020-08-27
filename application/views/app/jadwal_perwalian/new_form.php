@@ -59,7 +59,7 @@
                         <label for="waktu">Waktu</label>
                         <div class="form-group">
                             <div class="form-line">
-                                <input type="text" id="waktu" name="waktu" class="form-control datetimepicker <?php echo form_error('waktu') ? 'error':'' ?>" placeholder="Masukkan Waktu">
+                                <input type="text" id="waktu" name="waktu" class="form-control datetimepicker <?php echo form_error('waktu') ? 'error':'' ?>" placeholder="Masukkan Waktu" required>
                             </div>
 
                             <?php if(form_error('waktu')){ ?>

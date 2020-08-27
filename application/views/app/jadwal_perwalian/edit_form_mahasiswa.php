@@ -31,7 +31,7 @@
             <div class="card">
                 <div class="header">
                     <h2>
-                        EDIT <?= ucwords(implode(' ',explode('_',$this->uri->segment(1)))) ?>
+                        EDIT Pengajuan Bimbingan
                     </h2>
                     <ul class="header-dropdown m-r--5">
                         <li class="dropdown">
@@ -48,23 +48,6 @@
                 <div class="body">
                     <form action="" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="id" value="<?php echo $data_detail->id; ?>" />
-
-                        <label for="waktu">Waktu</label>
-                        <div class="form-group">
-                            <div class="form-line">
-                                <?php
-                                    $date_schedule = '';
-                                    if (!empty($data_detail->waktu)) {
-                                        $date_schedule = date('H:i d F Y', strtotime($data_detail->waktu));
-                                    }
-                                ?>
-                                <input value="<?php echo $date_schedule; ?>" type="text" id="waktu" name="waktu" class="form-control datetimepicker <?php echo form_error('waktu') ? 'error':'' ?>" placeholder="Masukkan Waktu" required>
-                            </div>
-
-                            <?php if(form_error('waktu')){ ?>
-                                <label id="waktu-error" class="error" for="waktu"><?php echo form_error('waktu') ?></label>
-                            <?php } ?>
-                        </div>
 
                         <label for="dosen_id">Dosen</label>
                         <div class="form-group">
