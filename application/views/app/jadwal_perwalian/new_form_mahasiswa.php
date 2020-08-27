@@ -16,11 +16,14 @@
 <?php
     $user_logged = $this->session->userdata("user_logged");
     $mahasiswa_id = '';
+    $mahasiswa_nama = '';
     $dosen_id = '';
+    $dosen_nama = '';
     if ($user_logged->role === '3') {
         $mahasiswa_ = $this->db->get_where('mahasiswa', ["user_id" => $user_logged->id])->row();
         $dosen_id = $mahasiswa_->dosen_id;
         $mahasiswa_id = $mahasiswa_->nim;
+        $mahasiswa_nama = $mahasiswa_->nama_mahasiswa;
     }
 ?>
 <div class="">
@@ -60,14 +63,20 @@
                     <form action="<?php echo site_url('jadwal_perwalian/add') ?>" method="post" enctype="multipart/form-data" >
                         <label for="dosen_id">Dosen</label>
                         <div class="form-group">
-                            <div class="form-line">
+                            <div class="form-line" style="display:none;">
                                 <select id="dosen_id" name="dosen_id" class="form-control show-tick <?php echo form_error('dosen_id') ? 'error':'' ?>" required>
                                     <option value="">-- Please select --</option>
                                     <?php foreach ($dosen as $row): ?>
+                                        <?php
+                                            if ($row->id == $dosen_id) {
+                                                $dosen_nama = $row->nama_dosen;
+                                            }
+                                        ?>
                                         <option value="<?php echo $row->id; ?>" <?= ($row->id == $dosen_id)? 'selected':'' ?>><?php echo $row->nama_dosen; ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
+                            <?= $dosen_nama ?>
 
                             <?php if(form_error('dosen_id')){ ?>
                                 <label id="dosen_id-error" class="error" for="dosen_id"><?php echo form_error('dosen_id') ?></label>
@@ -76,8 +85,8 @@
 
                         <label for="nim">Mahasiswa</label>
                         <div class="form-group">
-                            <div class="form-line">
-                                <select id="nim" name="nim" class="form-control show-tick <?php echo form_error('nim') ? 'error':'' ?>" required>
+                            <div class="form-line" style="display:none;">
+                                <select id="nim" name="nim" class="form-control show-tick <?php echo form_error('nim') ? 'error':'' ?>" required style="display:none;">
                                     <option value="">-- Please select --</option>
                                     <?php foreach ($mahasiswa as $row): ?>
                                         <?php if ($user_logged->role === '3' && $mahasiswa_id==$row->nim): ?>
@@ -88,6 +97,7 @@
                                     <?php endforeach; ?>
                                 </select>
                             </div>
+                            <?= $mahasiswa_nama ?>
 
                             <?php if(form_error('nim')){ ?>
                                 <label id="nim-error" class="error" for="nim"><?php echo form_error('nim') ?></label>

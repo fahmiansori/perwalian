@@ -167,6 +167,10 @@
                                       <td>
                                           <?php if ($row->status == 'waitingapproval'): ?>
                                               <?php if (isset($user) && $user && $user->role === '3'): ?>
+                                                  <a href="<?php echo site_url('jadwal_perwalian/edit/'.$row->id) ?>"
+                                                      class="btn btn-small"><i class="material-icons">gesture</i> Edit
+                                                  </a>
+                                                  
                                                   <a href="<?php echo site_url('jadwal_perwalian/form_uraian/'.$row->id) ?>" class="btn btn-small text-success">
                                                       <i class="material-icons">textsms</i> Isi uraian
                                                   </a>
