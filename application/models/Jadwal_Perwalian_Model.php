@@ -239,6 +239,11 @@ class Jadwal_Perwalian_Model extends CI_Model
 
         if (($data_edit) && $role !== '3' && $data_edit->status == 'waitingapproval') {
             $data_update['status'] = 'waiting';
+
+            $data_update_uraian = array(
+                'tanggal' => $waktu,
+            );
+            $this->db->update('perwalian_mahasiswa', $data_update_uraian, array('jadwal_perwalian_id' => $post['id']));
         }
 
         // jika mahasiswa, edit mengajukan jadwal

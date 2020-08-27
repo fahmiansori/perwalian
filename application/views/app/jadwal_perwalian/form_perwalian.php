@@ -77,6 +77,9 @@
 					<?php
 						function tanggal_indo($tanggal)
 						{
+							if (empty($tanggal)) {
+								return '-';
+							}
 							$hari = array ( 1 =>    'Senin',
 								'Selasa',
 								'Rabu',

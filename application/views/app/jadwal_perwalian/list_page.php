@@ -166,6 +166,12 @@
                                       </td>
                                       <td>
                                           <?php if ($row->status == 'waitingapproval'): ?>
+                                              <?php if (isset($user) && $user && $user->role === '3'): ?>
+                                                  <a href="<?php echo site_url('jadwal_perwalian/form_uraian/'.$row->id) ?>" class="btn btn-small text-success">
+                                                      <i class="material-icons">textsms</i> Isi uraian
+                                                  </a>
+                                              <?php endif; ?>
+
                                               <?php if (isset($user) && $user && ($user->role === '1' || $user->role === '2')): ?>
                                                   <a href="<?php echo site_url('jadwal_perwalian/edit/'.$row->id) ?>"
                                                       class="btn btn-small col-pink"><i class="material-icons">perm_contact_calendar</i> Tentukan Waktu
@@ -215,10 +221,10 @@
                                                       </a>
                                                   <?php endif; ?>
                                               <?php endif; ?>
-
-                                              <a href="<?php echo site_url('jadwal_perwalian/form_perwalian/'.$row->id) ?>" class="btn btn-small text-success"><i class="material-icons">print</i> Print
-                                              </a>
                                           <?php endif; ?>
+
+                                          <a href="<?php echo site_url('jadwal_perwalian/form_perwalian/'.$row->id) ?>" class="btn btn-small text-success"><i class="material-icons">print</i> Print
+                                          </a>
                                       </td>
                                   </tr>
                               <?php endforeach; ?>
