@@ -16,9 +16,13 @@
 <?php
     $user_logged = $this->session->userdata("user_logged");
     $dosen_id = '';
+    $dosen_nama = '';
+    $dosen_form_display = '';
     if ($user_logged->role === '2') {
         $dosen_ = $this->db->get_where('dosen', ["user_id" => $user_logged->id])->row();
         $dosen_id = $dosen_->id;
+        $dosen_nama = $dosen_->nama_dosen;
+        $dosen_form_display = 'none';
     }
 ?>
 <div class="">
@@ -69,10 +73,16 @@
 
                         <label for="dosen_id">Dosen</label>
                         <div class="form-group">
-                            <div class="form-line">
+                            <div class="form-line" style="display:<?= $dosen_form_display ?>">
                                 <select id="dosen_id" name="dosen_id" class="form-control show-tick <?php echo form_error('dosen_id') ? 'error':'' ?>" required>
                                     <option value="">-- Please select --</option>
                                     <?php foreach ($dosen as $row): ?>
+                                        <?php
+                                            if ($row->id == $dosen_id) {
+                                                $dosen_nama = $row->nama_dosen;
+                                            }
+                                        ?>
+                                        
                                         <?php if ($user_logged->role === '2' && $dosen_id==$row->id): ?>
                                             <option value="<?php echo $row->id; ?>" <?php echo ($dosen_id==$row->id)? 'selected':''; ?>><?php echo $row->nama_dosen; ?></option>
                                         <?php else: ?>
@@ -81,6 +91,7 @@
                                     <?php endforeach; ?>
                                 </select>
                             </div>
+                            <?= $dosen_nama ?>
 
                             <?php if(form_error('dosen_id')){ ?>
                                 <label id="dosen_id-error" class="error" for="dosen_id"><?php echo form_error('dosen_id') ?></label>
