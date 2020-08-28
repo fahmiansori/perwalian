@@ -21,14 +21,17 @@
     $dosen_nama = '';
     $dosen_form_display = '';
     $mahasiswa_form_display = '';
+    $semester_form_display = '';
     if ($user_logged->role === '2') {
         // $dosen_ = $this->db->get_where('dosen', ["user_id" => $user_logged->id])->row();
         // $dosen_id = $dosen_->id;
         $dosen_form_display = 'none';
     }
 
-    if (empty($data_detail->waktu) && $data_detail->status=='waitingapproval') {
+    if ($data_detail->status=='waitingapproval') {
+        $dosen_form_display = 'none';
         $mahasiswa_form_display = 'none';
+        $semester_form_display = 'none';
     }
 ?>
 <div class="">
@@ -84,65 +87,71 @@
                             <?php } ?>
                         </div>
 
-                        <label for="dosen_id">Dosen</label>
-                        <div class="form-group">
-                            <div class="form-line" style="display:<?= $dosen_form_display ?>">
-                                <select id="dosen_id" name="dosen_id" class="form-control show-tick <?php echo form_error('dosen_id') ? 'error':'' ?>" required>
-                                    <option value="">-- Please select --</option>
-                                    <?php foreach ($dosen as $row): ?>
-                                        <?php
-                                            if ($row->id == $dosen_id) {
-                                                $dosen_nama = $row->nama_dosen;
-                                            }
-                                        ?>
+                        <div class="" style="display:<?= $dosen_form_display ?>">
+                            <label for="dosen_id">Dosen</label>
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <select id="dosen_id" name="dosen_id" class="form-control show-tick <?php echo form_error('dosen_id') ? 'error':'' ?>" required>
+                                        <option value="">-- Please select --</option>
+                                        <?php foreach ($dosen as $row): ?>
+                                            <?php
+                                                if ($row->id == $dosen_id) {
+                                                    $dosen_nama = $row->nama_dosen;
+                                                }
+                                            ?>
 
-                                        <option value="<?php echo $row->id; ?>" <?php echo $data_detail->dosen_id==$row->id ? 'selected':'' ?>><?php echo $row->nama_dosen; ?></option>
-                                    <?php endforeach; ?>
-                                </select>
+                                            <option value="<?php echo $row->id; ?>" <?php echo $data_detail->dosen_id==$row->id ? 'selected':'' ?>><?php echo $row->nama_dosen; ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <?php if (!empty($dosen_form_display)): ?>
+                                    <?= $dosen_nama ?>
+                                <?php endif; ?>
+
+                                <?php if(form_error('dosen_id')){ ?>
+                                    <label id="dosen_id-error" class="error" for="dosen_id"><?php echo form_error('dosen_id') ?></label>
+                                <?php } ?>
                             </div>
-                            <?php if (!empty($dosen_form_display)): ?>
-                                <?= $dosen_nama ?>
-                            <?php endif; ?>
-
-                            <?php if(form_error('dosen_id')){ ?>
-                                <label id="dosen_id-error" class="error" for="dosen_id"><?php echo form_error('dosen_id') ?></label>
-                            <?php } ?>
                         </div>
 
-                        <label for="nim">Mahasiswa</label>
-                        <div class="form-group">
-                            <div class="form-line" style="display:<?= $mahasiswa_form_display ?>">
-                                <select id="nim" name="nim" class="form-control show-tick <?php echo form_error('nim') ? 'error':'' ?>" required>
-                                    <option value="">-- Please select --</option>
-                                    <?php foreach ($mahasiswa as $row): ?>
-                                        <?php
-                                            if ($row->nim == $mahasiswa_id) {
-                                                $mahasiswa_nama = $row->nama_mahasiswa;
-                                            }
-                                        ?>
+                        <div class="" style="display:<?= $mahasiswa_form_display ?>">
+                            <label for="nim">Mahasiswa</label>
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <select id="nim" name="nim" class="form-control show-tick <?php echo form_error('nim') ? 'error':'' ?>" required>
+                                        <option value="">-- Please select --</option>
+                                        <?php foreach ($mahasiswa as $row): ?>
+                                            <?php
+                                                if ($row->nim == $mahasiswa_id) {
+                                                    $mahasiswa_nama = $row->nama_mahasiswa;
+                                                }
+                                            ?>
 
-                                        <option value="<?php echo $row->nim; ?>" <?php echo $data_detail->nim==$row->nim ? 'selected':'' ?>><?php echo $row->nama_mahasiswa; ?></option>
-                                    <?php endforeach; ?>
-                                </select>
+                                            <option value="<?php echo $row->nim; ?>" <?php echo $data_detail->nim==$row->nim ? 'selected':'' ?>><?php echo $row->nama_mahasiswa; ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <?php if (!empty($mahasiswa_form_display)): ?>
+                                    <?= $mahasiswa_nama ?>
+                                <?php endif; ?>
+
+                                <?php if(form_error('nim')){ ?>
+                                    <label id="nim-error" class="error" for="nim"><?php echo form_error('nim') ?></label>
+                                <?php } ?>
                             </div>
-                            <?php if (!empty($mahasiswa_form_display)): ?>
-                                <?= $mahasiswa_nama ?>
-                            <?php endif; ?>
-
-                            <?php if(form_error('nim')){ ?>
-                                <label id="nim-error" class="error" for="nim"><?php echo form_error('nim') ?></label>
-                            <?php } ?>
                         </div>
 
-                        <label for="semester">Semester Mahasiswa</label>
-                        <div class="form-group">
-                            <div class="form-line">
-                                <input value="<?php echo $data_detail->semester; ?>" type="number" id="semester" name="semester" class="form-control <?php echo form_error('semester') ? 'error':'' ?>" placeholder="Masukkan semester" required>
-                            </div>
+                        <div class="" style="display:<?= $semester_form_display ?>">
+                            <label for="semester">Semester Mahasiswa</label>
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <input value="<?php echo $data_detail->semester; ?>" type="number" id="semester" name="semester" class="form-control <?php echo form_error('semester') ? 'error':'' ?>" placeholder="Masukkan semester" required>
+                                </div>
 
-                            <?php if(form_error('semester')){ ?>
-                                <label id="semester-error" class="error" for="semester"><?php echo form_error('semester') ?></label>
-                            <?php } ?>
+                                <?php if(form_error('semester')){ ?>
+                                    <label id="semester-error" class="error" for="semester"><?php echo form_error('semester') ?></label>
+                                <?php } ?>
+                            </div>
                         </div>
 
                         <br>

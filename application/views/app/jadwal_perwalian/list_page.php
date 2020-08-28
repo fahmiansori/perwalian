@@ -81,7 +81,12 @@
                               <i class="material-icons">more_vert</i>
                           </a>
                           <ul class="dropdown-menu pull-right">
-                              <li><a href="<?php echo site_url('jadwal_perwalian/add') ?>">Tambah Jadwal</a></li>
+                              <?php if (isset($user) && $user && $user->role === '1' || isset($user) && $user && $user->role === '2'): ?>
+                                  <li><a href="<?php echo site_url('jadwal_perwalian/add') ?>">Add</a></li>
+                              <?php endif; ?>
+                              <?php if (isset($user) && $user && $user->role === '3'): ?>
+                                  <li><a href="<?php echo site_url('jadwal_perwalian/tambah_form_uraian') ?>">Add</a></li>
+                              <?php endif; ?>
                           </ul>
                       </li>
                   </ul>
@@ -166,11 +171,13 @@
                                       </td>
                                       <td>
                                           <?php if ($row->status == 'waitingapproval'): ?>
-                                              <?php if (isset($user) && $user && $user->role === '3'): ?>
+                                              <?php if (isset($user) && $user && $user->role === '3' && empty($row->waktu)): ?>
                                                   <a href="<?php echo site_url('jadwal_perwalian/edit/'.$row->id) ?>"
                                                       class="btn btn-small"><i class="material-icons">gesture</i> Edit
                                                   </a>
-                                                  
+                                              <?php endif; ?>
+
+                                              <?php if (isset($user) && $user && $user->role === '3'): ?>
                                                   <a href="<?php echo site_url('jadwal_perwalian/form_uraian/'.$row->id) ?>" class="btn btn-small text-success">
                                                       <i class="material-icons">textsms</i> Isi uraian
                                                   </a>

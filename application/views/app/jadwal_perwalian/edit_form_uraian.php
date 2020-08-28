@@ -117,7 +117,7 @@
                             ?>
                         </div>
                         <div class="">
-                            <button type="button" class="btn btn-success btn-sm" id="add_item" name="">
+                            <button type="button" class="btn btn-success btn-sm" id="add_item" name="" title="Tambah uraian">
                                 <i class="material-icons">playlist_add</i>
                             </button>
                         </div>

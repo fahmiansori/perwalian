@@ -157,6 +157,7 @@ class Jadwal_Perwalian extends CI_Controller
         if ($validation->run()) {
             $model->updateisi();
             $this->session->set_flashdata('success', 'Berhasil disimpan');
+            return redirect(site_url('jadwal_perwalian'));
         }
         $data = [];
 
@@ -186,6 +187,7 @@ class Jadwal_Perwalian extends CI_Controller
         if ($validation->run()) {
             $model->save();
             $this->session->set_flashdata('success', 'Berhasil disimpan');
+            return redirect(site_url('jadwal_perwalian'));
         }
         $data = [];
         $data['dosen'] = $this->db->get('dosen')->result();
@@ -212,6 +214,7 @@ class Jadwal_Perwalian extends CI_Controller
         if ($validation->run()) {
             $model->update();
             $this->session->set_flashdata('success', 'Berhasil disimpan');
+            return redirect(site_url('jadwal_perwalian'));
         }
         $data = [];
         $data['dosen'] = $this->db->get('dosen')->result();
@@ -261,6 +264,36 @@ class Jadwal_Perwalian extends CI_Controller
         $this->load->view("app/jadwal_perwalian/form_perwalian", $data);
     }
 
+    public function tambah_form_uraian()
+    {
+        $model = $this->jadwal_perwalian_model;
+        $validation = $this->form_validation;
+        $validation->set_rules($model->rulesedituraianadd());
+
+        if ($validation->run()) {
+            $model->savejadwaluraian();
+            $this->session->set_flashdata('success', 'Berhasil disimpan');
+            return redirect(site_url('jadwal_perwalian'));
+        }
+        $data = [];
+
+        $user_logged = $this->session->userdata("user_logged");
+        $data['mahasiswa_id'] = '';
+        $data['mahasiswa_nama'] = '';
+        $data['dosen_id'] = '';
+        $data['dosen_nama'] = '';
+        if ($user_logged->role === '3') {
+            $mahasiswa_ = $this->db->get_where('mahasiswa', ["user_id" => $user_logged->id])->row();
+            $data['dosen_id'] = $mahasiswa_->dosen_id;
+            $data['mahasiswa_id'] = $mahasiswa_->nim;
+            $data['mahasiswa_nama'] = $mahasiswa_->nama_mahasiswa;
+        }else {
+            return redirect(site_url('jadwal_perwalian'));
+        }
+
+        $this->load->view("app/jadwal_perwalian/new_form_uraian", $data);
+    }
+
     public function form_uraian($id)
     {
         if (!isset($id)) redirect(site_url('jadwal_perwalian'));
@@ -272,6 +305,7 @@ class Jadwal_Perwalian extends CI_Controller
         if ($validation->run()) {
             $model->updateuraian();
             $this->session->set_flashdata('success', 'Berhasil disimpan');
+            return redirect(site_url('jadwal_perwalian'));
         }
         $data = [];
 

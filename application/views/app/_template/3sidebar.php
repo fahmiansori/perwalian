@@ -20,7 +20,7 @@
         $this->db->where('jadwal_perwalian.nim', $mahasiswa->nim);
     }
     $this->db->from('jadwal_perwalian');
-    $this->db->where('jadwal_perwalian.waktu like \'%'. date('Y-m-d') .'%\'');
+    $this->db->where('jadwal_perwalian.waktu like \'%'. date('Y-m-d') .'%\' AND jadwal_perwalian.status != \'waitingapproval\'');
     $total_today = $this->db->count_all_results();
 ?>
 
@@ -126,9 +126,11 @@
                             <?php if ($total_today > 0): ?>
                                 <span class="badge bg-pink" style="color:#fff;"><?= $total_today ?></span>
                             <?php endif; ?>
+
                             <?php if ($total_waitingapproval > 0): ?>
                                 <span class="badge bg-brown" style="color:#fff;"><?= $total_waitingapproval ?></span>
                             <?php endif; ?>
+
                         </span>
                     </a>
 
@@ -145,14 +147,16 @@
                                 <?php endif; ?>
                             </a>
                         </li>
+
                         <li class="<?php echo $this->uri->segment(2) == 'menunggu_persetujuan'? 'active':'';?>">
                             <a href="<?= site_url('jadwal_perwalian/menunggu_persetujuan') ?>">
-                                Menunggu Jadwal
+                                Menunggu Persetujuan
                                 <?php if ($total_waitingapproval > 0): ?>
                                     <span class="badge bg-brown" style="color:#fff;"><?= $total_waitingapproval ?></span>
                                 <?php endif; ?>
                             </a>
                         </li>
+
                         <li class="<?php echo $this->uri->segment(2) == 'menunggu'? 'active':'';?>">
                             <a href="<?= site_url('jadwal_perwalian/menunggu') ?>">Menunggu</a>
                         </li>

@@ -56,6 +56,23 @@ class Jadwal_Perwalian_Model extends CI_Model
         ];
     }
 
+    public function rulesedituraianadd()
+    {
+        return [
+            ['field' => 'waktu',
+            'label' => 'Waktu',
+            'rules' => 'required'],
+
+            ['field' => 'jenis[]',
+            'label' => 'Jenis',
+            'rules' => 'required'],
+
+            ['field' => 'uraian[]',
+            'label' => 'Uraian',
+            'rules' => 'required'],
+        ];
+    }
+
     public function rulesedituraian()
     {
         return [
@@ -119,6 +136,7 @@ class Jadwal_Perwalian_Model extends CI_Model
         }
 
         if (!empty($date)) {
+            $this->db->where($this->_table.'.status != \'waitingapproval\'');
             $this->db->where($this->_table.'.waktu like \'%'. $date .'%\'');
         }
         if (!empty($cond)) {
@@ -281,6 +299,50 @@ class Jadwal_Perwalian_Model extends CI_Model
         $this->db->join('jadwal_perwalian', 'jadwal_perwalian.id = perwalian_mahasiswa.jadwal_perwalian_id');
 
         return $this->db->get();
+    }
+
+    public function savejadwaluraian()
+    {
+        $post = $this->input->post();
+
+        $user_logged_id = $this->session->userdata("user_logged");
+        $user_id = (int)$user_logged_id->id;
+
+        $waktu = isset($post["waktu"])? $post["waktu"]:date('Y-m-d H:i:s');
+        $waktu = date('Y-m-d H:i:s', strtotime($waktu));
+
+        $data_insert_jadwal = array(
+            'nim' => $post["nim"],
+            'dosen_id' => $post["dosen_id"],
+            'user_id' => $user_id,
+            'waktu' => $waktu,
+            'status' => 'waitingapproval',
+            'semester' => $post["semester"],
+        );
+        $this->db->insert($this->_table, $data_insert_jadwal);
+        $last_jadwal_id = $this->db->insert_id();
+
+        $post_jenis = $post["jenis"];
+        if (!empty($post_jenis)) {
+            $index = 0;
+            foreach ($post_jenis as $key) {
+                $data_insert = array(
+                    'jadwal_perwalian_id' => $last_jadwal_id,
+                    'tanggal' => $waktu,
+                    'jenis' => $key,
+                    'uraian' => $post["uraian"][$index],
+                    'index' => ++$index,
+                    'status' => 1,
+                );
+
+                $this->db->insert('perwalian_mahasiswa', $data_insert);
+            }
+        }
+        else {
+            return false;
+        }
+
+        return TRUE;
     }
 
     public function updateuraian()
