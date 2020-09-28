@@ -16,9 +16,9 @@ class Dosen extends CI_Controller
 
     function index(){
         //konfigurasi pagination
-        $config['base_url'] = site_url('dosen'); //site url
+        $config['base_url'] = site_url('dosen/index'); //site url
         $config['total_rows'] = $this->db->count_all('dosen'); //total row
-        $config['per_page'] = 10;  //show record per halaman
+        $config['per_page'] = 1;  //show record per halaman
         $config["uri_segment"] = 3;  // uri parameter
         $choice = $config["total_rows"] / $config["per_page"];
         $config["num_links"] = floor($choice);

@@ -212,6 +212,26 @@
                                                       <?php endif; ?>
                                                   <?php endif;?>
 
+                                                  <?php if(date('Y-m-d', strtotime($today)) > date('Y-m-d',strtotime($row->waktu)) && $row->status == 'expired'):?>
+                                                      <a href="<?php echo site_url('jadwal_perwalian/batalkan/'.$row->id.'/'.$this->uri->segment(2)) ?>"
+                                                          class="btn btn-small text-warning"><i class="material-icons">stop</i> Batalkan
+                                                      </a>
+
+                                                      <a href="<?php echo site_url('jadwal_perwalian/bimbingan/'.$row->id) ?>"
+                                                          class="btn btn-small col-teal"><i class="material-icons">skip_next</i> Sedang bimbingan
+                                                      </a>
+
+                                                      <a href="<?php echo site_url('jadwal_perwalian/edit/'.$row->id) ?>"
+                                                          class="btn btn-small"><i class="material-icons">gesture</i> Edit
+                                                      </a>
+
+                                                      <?php if (isset($user) && $user && $user->role === '1'): ?>
+                                                          <a onclick="deleteConfirm('<?php echo site_url('jadwal_perwalian/delete/'.$row->id) ?>')"
+                                                              href="#!" class="btn btn-small text-danger"><i class="material-icons">delete_forever</i> Hapus
+                                                          </a>
+                                                      <?php endif; ?>
+                                                  <?php endif;?>
+
                                                   <?php if($row->status == 'onprocess'):?>
                                                       <a href="<?php echo site_url('jadwal_perwalian/selesaikan/'.$row->id) ?>"
                                                           class="btn btn-small text-success"><i class="material-icons">check</i> Selesai
